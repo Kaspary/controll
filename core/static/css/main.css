@@ -1,0 +1,179 @@
+/*CSS MODIFICATIONS*/
+body{
+    color: #555;
+}
+.panel_toolbox {
+    min-width: 0px;
+}
+
+#menu_toggle i{
+    color: #2a3f54;
+}
+/*END CSS MODIFICATIONS*/
+
+/*CSS PROGRESS-BAR TOTAL MONTH*/
+
+.progress-bar-total-month .progress_sm{
+    background: #1ABB9C;
+    height: 5px!important;
+}
+
+.progress-bar-total-month .progress-bar{
+    background: #ff7676;
+}
+
+
+/*END CSS PROGRESS-BAR TOTAL MONTH*/
+
+
+
+/*CSS EARNINGS INPUT*/
+
+.earnings-input .col-sm-6,
+.expense-input .input{
+    padding: 0px
+}
+
+.earnings-input input[name="name"]{
+    padding: 0 5px;
+    border-right-style: none;
+}
+
+.earnings-input input[name="value"]{
+    padding: 0 5px;
+    border-left-color: #e2e2e2;
+}
+
+.earnings-input .btn-primary {
+    background-color: #1ABB9C;
+    border-color: #1ABB9C;
+}
+
+.earnings-input .btn-primary:hover {
+    background-color: #229b84;
+    border-color: #229b84;
+}
+
+/*END CSS EARNINGS INPUT*/
+
+/*CSS EARNINGS INPUT*/
+
+.expense-input .input{
+    display: inline-table;
+}
+
+.expense-input input[name="name"],
+.expense-input input[name="value"]{
+    padding: 0 5px;
+    border-right-style: none;
+}
+
+.expense-input input[name="value"],
+.expense-input .input select[name="group"]{
+    border-left-color: #e2e2e2;
+}
+
+.expense-input .input select[name="group"]{
+    padding: 0px;
+}
+
+.expense-input .btn-primary {
+    background-color: #ff7676;
+    border-color: #ff7676;
+}
+
+.expense-input .btn-primary:hover {
+    background-color: #ec6565;
+    border-color: #ec6565;
+}
+/*END CSS EARNINGS INPUT*/
+
+
+/*CSS TABLE EDITABLE*/
+
+.table-editable.table>tbody>tr>td{
+    vertical-align: inherit;
+}
+
+.table-editable .head-actions{
+    text-align: center;
+}
+
+.table-editable .actions{
+    padding: 0px;
+    word-spacing: 5px;
+    font-size: 20px;
+    text-align: center;
+}
+
+.table-editable .actions a{
+    color: #C5C7CB;
+}
+
+.table-editable .actions .trash:hover,
+.table-editable .actions .trash:focus{
+    color: #ec6565;
+}
+
+.table-editable .actions .fix:hover,
+.table-editable .actions .fix-active{
+    color: #ffc107;
+}
+
+
+.table-editable input,
+.table-editable select{
+    border: transparent;
+    background: transparent;
+    width: 100%;
+}
+
+.table-editable select{
+    /*width: max-content;*/
+    min-width: 100px;
+   -webkit-appearance: none;  /* Remove estilo padrão do Chrome */
+}
+/*END CSS TABLE EDITABLE*/
+
+
+/*CSS TABLE INFO*/
+
+.table-info{
+    margin: 10px;
+}
+
+.table-info td{
+    vertical-align: inherit;
+    font-size:14px;
+    padding: 10px;
+}
+.table-info td i{
+    font-size: 6px;
+    padding: 5px;
+}
+
+.table-info td:first-child{
+    font-weight: bold;
+}
+
+/*END CSS TABLE INFO*/
+
+
+/*CSS HEADER DATE*/
+
+.header-date{
+    background: #fff;
+    border: 1px solid #E6E9ED;
+    display: flex;
+    padding: 15px;
+    margin: 15px 0px;
+}
+
+/*END CSS HEADER DATE*/
+
+
+/*CSS CHART*/
+.table-info .chart-info{
+    padding:20px;
+}
+/*END CSS CHART*/
