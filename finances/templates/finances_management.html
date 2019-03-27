@@ -25,8 +25,8 @@
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="progress-bar-total-month">
-                <div class="progress progress_sm" data-toggle="tooltip" data-placement="bottom" data-original-title="">
-                    <div class="progress-bar" data-toggle="tooltip" data-placement="bottom" data-original-title="" role="progressbar" data-transitiongoal=""></div>
+                <div class="progress progress_sm" data-toggle="tooltip" data-placement="bottom" data-total-earnings="0" data-original-title="">
+                    <div class="progress-bar" data-toggle="tooltip" data-placement="bottom" data-original-title="" role="progressbar" data-total-expense="0" data-transitiongoal=""></div>
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
                     </ul>
                     <div class="clearfix"></div>
                 </div>
-                <div class="x_content" style="display: block;">
+                <div class="x_content earnings-content" style="display: block;">
                     <div class="col-md-8 col-sm-8 col-xs-8">
                         <form class="earnings-form" data-parsley-validate>
                             <div class="form-group earnings-input">
@@ -76,6 +76,9 @@
                                     <th class="head-actions">Ações</th>
                                 </tr>
                             </thead>
+                            <tbody class="earnings-tbody">
+                                <!-- Table here -->
+                            </tbody>
                             <tfoot>
                                 <!-- <tr>
                                     <th>Total</th>
@@ -86,6 +89,18 @@
                         </table>
                     </div>
                     <div class="col-md-4 col-sm-4 col-xs-4">
+                        <table class="table-info">
+                            <tbody>
+                                <tr>
+                                    <td><i class="fa fa-circle"></i>Total</td>
+                                    <td class="value-total"> --- </td>
+                                </tr>
+                                <tr>
+                                    <!-- <td><i class="fa fa-circle"></i></td> -->
+                                    <!-- <td</td> -->
+                                </tr>
+                            </tbody>
+                        </table>
                         <!-- <div class="chart-info">
                             <canvas id="earnings_chart"></canvas>
                         </div> -->

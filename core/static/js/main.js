@@ -4,6 +4,10 @@ const DATE = {
     'month': '',
 }
 
+var CHART_COLORS =  [
+    "#023fa5", "#7d87b9", "#bec1d4", "#d6bcc0", "#bb7784", "#8e063b", "#4a6fe3", "#8595e1", "#b5bbe3", "#e6afb9", "#e07b91", "#d33f6a", "#11c638", "#8dd593", "#c6dec7", "#ead3c6", "#f0b98d", "#ef9708", "#0fcfc0", "#9cded6", "#d5eae7", "#f3e1eb", "#f6c4e1", "#f79cd4"
+]
+
 const COLORS = [
     '#d9534f', //red
     '#26B99A', //green
@@ -67,6 +71,7 @@ var EXPENSES = [
 ]
 
 
+
 $(document).ready(function () {
     $('.calendar-select').calendar({
         type: 'month',
@@ -98,7 +103,9 @@ function changeDate(date) {
 $('form.earnings-form').on('submit', function (e) {
     e.preventDefault();
     let title = $('form.earnings-form input[name="title"]').val();
-    let value = string_to_value($('form.earnings-form input[name="value"]').val());
+    // let value = string_to_value($('form.earnings-form input[name="value"]').val());
+    let value = $('form.earnings-form input[name="value"]').maskMoney( "unmasked" )[0]
+    console.log(value)
     clear_form(this);
 
     append_earnings({
@@ -113,14 +120,15 @@ $('form.earnings-form').on('submit', function (e) {
         delay: 1000,
         type: 'success',
         styling: 'bootstrap3'
-    });
+    });CHART_COLORS
 })
 
 
 $('form.expense-form').on('submit', function (e) {
     e.preventDefault();
     let title = $('form.expense-form input[name="title"]').val();
-    let value = string_to_value($('form.expense-form input[name="value"]').val());
+    // let value = string_to_value($('form.expense-form input[name="value"]').val());
+    let value = $('form.expense-form input[name="value"]').maskMoney( "unmasked" )[0]
     let group = $('form.expense-form select[name="group"]').val();
     clear_form(this);
 
@@ -317,6 +325,17 @@ function append_earnings(earnings) {
     }
     EARNINGS.push(earnings)
     // mount_charts_earnings();
+
+    let total=0;
+    EARNINGS.forEach(function(e){
+        total = total + e.value;
+    })
+
+    $('.earnings-content .table-info .value-total').text(value_to_string(total));
+
+    $('.progress-bar-total-month [data-total-earnings]').attr({'data-total-earnings':total})
+
+    update_progress_bar();
 }
 
 function append_expanse(expense) {
@@ -338,6 +357,13 @@ function append_expanse(expense) {
                 </td>\
             </tr>');
 
+
+    // $('.expense-tbody tr[data-expense-id="' + expense.id + '"] .mask_money').maskMoney({
+    //     prefix:'R$ ',
+    //     decimal: ",", 
+    //     thousands: "."
+    // })
+
     $('.expense-tbody tr[data-expense-id="' + expense.id + '"] select').val(expense.group)
     set_mask('.expense-tbody tr[data-expense-id="' + expense.id + '"] .mask_money', expense.value)
     if (expense.fixed) {
@@ -353,12 +379,22 @@ function append_expanse(expense) {
 
     $('.expense-content .table-info .value-total').text(value_to_string(total));
 
-    $('.progress-bar-total-month .progress-bar').attr({
-        'data-transitiongoal': (total*100)/2000>100 ? 100 : (total*100)/2000,
-        'data-original-title': Math.trunc((total*100)/2000)+'%'}
-        ).progressbar();
+    $('.progress-bar-total-month [data-total-expense]').attr({'data-total-expense':total})
+
+    update_progress_bar();
 }
 
+
+function update_progress_bar(){
+
+    let earnings = $('.progress-bar-total-month [data-total-earnings]').attr('data-total-earnings')
+    let expense =  $('.progress-bar-total-month [data-total-expense]').attr('data-total-expense')
+
+    $('.progress-bar-total-month .progress-bar').attr({
+        'data-transitiongoal': (expense*100)/earnings>100 ? 100 : (expense*100)/earnings,
+        'data-original-title': Math.trunc((expense*100)/earnings>100 ? 100 : (expense*100)/earnings)+'%'}
+        ).progressbar();
+}
 
 
 function log(text){

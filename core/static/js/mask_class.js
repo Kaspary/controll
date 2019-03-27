@@ -25,14 +25,15 @@ function value_to_string(value){
     return value.toLocaleString("pt-BR",{ style: "currency" , currency:"BRL"})
 }
 
-function string_to_value(value){
-    return +parseFloat(value.replace(/[^0-9\,]/g,'').replace(',','.')).toFixed(2)
-}
+// function string_to_value(value){
+//     return +parseFloat(value.replace(/[^0-9\,]/g,'').replace(',','.')).toFixed(2)
+// }
 
 function set_mask(class_mask, value){
+    console.log(value)
     $(class_mask).maskMoney({
         prefix:'R$ ',
         decimal: ",", 
-        thousands: "."
-    }).maskMoney('mask', value);;
+        thousands: ".",
+    }).maskMoney('mask', value);
 }
