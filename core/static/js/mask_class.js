@@ -30,7 +30,6 @@ function value_to_string(value){
 // }
 
 function set_mask(class_mask, value){
-    console.log(value)
     $(class_mask).maskMoney({
         prefix:'R$ ',
         decimal: ",", 

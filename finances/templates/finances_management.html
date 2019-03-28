@@ -1,5 +1,19 @@
 {% extends "base.html" %} {% block content %}
 
+<input id="csrf_token_url" type="hidden" value="{{ csrf_token }}" />
+<input id="user_id" type="hidden" value="{{ user.pk }}" />
+
+<input id="get_finances_url" type="hidden" value="{% url 'finances:get_finances' %}" />
+
+<input id="save_earnings_url" type="hidden" value="{% url 'finances:save_earnings' %}" />
+<input id="edit_earnings_url" type="hidden" value="{% url 'finances:edit_earnings' %}" />
+<input id="fix_earnings_url" type="hidden" value="{% url 'finances:fix_earnings' %}" />
+<input id="remove_earnings_url" type="hidden" value="{% url 'finances:remove_earnings' %}" />
+
+<input id="save_expanse_url" type="hidden" value="{% url 'finances:save_expanse' %}" />
+<input id="edit_expanse_url" type="hidden" value="{% url 'finances:edit_expanse' %}" />
+<input id="remove_expanse_url" type="hidden" value="{% url 'finances:remove_expanse' %}" />
+
 <!-- page content -->
 <div class="right_col" role="main">
 
@@ -139,11 +153,10 @@
                                 </div>
 
                                 <div class="btn-group input col-sm-5" required="required">
-                                    <select class="form-control" name="group">
-                                        <option value="Alimentação">Alimentação</option>
-                                        <option value="Estudo">Estudo</option>
-                                        <option value="Transporte">Transporte</option>
-                                        <option value="Moradia">Moradia</option>
+                                    <select class="form-control" name="category">
+                                        {% for c in system_user.expense_category.all %}
+                                            <option value="{{c.pk}}">{{c.title}}</option>
+                                        {% endfor %}
                                     </select>
 
                                     <span class="input-group-btn">

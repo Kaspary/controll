@@ -61,7 +61,7 @@
               </div>
               <div class="profile_info">
                 <span>Bem Vindo</span>
-                <h2>{{ user.username }}</h2>
+                <h2>{{ system_user.first_name }}</h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -203,7 +203,7 @@
               <ul class="nav navbar-nav navbar-right">
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{% static 'images/img.jpg' %}" alt="">{{ user.username }}
+                    <img src="{% static 'images/img.jpg' %}" alt="">{{ system_user.first_name }}
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">

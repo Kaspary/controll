@@ -9,6 +9,16 @@ body{
 #menu_toggle i{
     color: #2a3f54;
 }
+
+.nav.side-menu>li.active, .nav.side-menu>li.current-page {
+    border-right: 5px solid #172d44;
+}
+
+.scroll-view{
+    position: fixed;
+    width: inherit;
+}
+
 /*END CSS MODIFICATIONS*/
 
 /*CSS PROGRESS-BAR TOTAL MONTH*/
@@ -29,8 +39,11 @@ body{
 
 /*CSS EARNINGS INPUT*/
 
-.earnings-input .col-sm-6,
-.expense-input .input{
+.earnings-input .input-group{
+    margin-bottom:0px; 
+}
+
+.earnings-input .col-sm-6{
     padding: 0px
 }
 
@@ -56,10 +69,11 @@ body{
 
 /*END CSS EARNINGS INPUT*/
 
-/*CSS EARNINGS INPUT*/
+/*CSS EXPENSE INPUT*/
 
 .expense-input .input{
     display: inline-table;
+    padding: 0px
 }
 
 .expense-input input[name="name"],
@@ -86,7 +100,7 @@ body{
     background-color: #ec6565;
     border-color: #ec6565;
 }
-/*END CSS EARNINGS INPUT*/
+/*END CSS EXPENSE INPUT*/
 
 
 /*CSS TABLE EDITABLE*/

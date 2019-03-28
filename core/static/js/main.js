@@ -2,9 +2,10 @@
 const DATE = {
     'year': '',
     'month': '',
+    'day': ''
 }
 
-var CHART_COLORS =  [
+var CHART_COLORS = [
     "#023fa5", "#7d87b9", "#bec1d4", "#d6bcc0", "#bb7784", "#8e063b", "#4a6fe3", "#8595e1", "#b5bbe3", "#e6afb9", "#e07b91", "#d33f6a", "#11c638", "#8dd593", "#c6dec7", "#ead3c6", "#f0b98d", "#ef9708", "#0fcfc0", "#9cded6", "#d5eae7", "#f3e1eb", "#f6c4e1", "#f79cd4"
 ]
 
@@ -44,28 +45,28 @@ var EXPENSES = [
     //     'id': 4,
     //     'title': 'Aluguel',
     //     'value': 500,
-    //     'group': 'Moradia',
+    //     'category': 'Moradia',
     //     'fixed': true
     // },
     // {
     //     'id': 1,
     //     'title': 'Almoço',
     //     'value': 15,
-    //     'group': 'Alimentação',
+    //     'category': 'Alimentação',
     //     'fixed': false
     // },
     // {
     //     'id': 2,
     //     'title': 'Gasolina',
     //     'value': 50,
-    //     'group': 'Transporte',
+    //     'category': 'Transporte',
     //     'fixed': false
     // },
     // {
     //     'id': 3,
     //     'title': 'Mercado',
     //     'value': 35,
-    //     'group': 'Alimentação',
+    //     'category': 'Alimentação',
     //     'fixed': false
     // },
 ]
@@ -87,56 +88,79 @@ $(document).ready(function () {
         },
     });
     $('.calendar-select').calendar('set date', new Date());
-    // mount_charts_expense();
-    // mount_charts_earnings();
-    // mount_table();
 });
 
 
 function changeDate(date) {
     DATE.month = date.getMonth() + 1;
     DATE.year = date.getFullYear();
-    console.log('DATE:',DATE)
+    DATE.day = date.getDate();
+    ajax_get_finances();
+    console.log('DATE:', DATE)
 }
 
 
 $('form.earnings-form').on('submit', function (e) {
     e.preventDefault();
+    let form = this;
+
     let title = $('form.earnings-form input[name="title"]').val();
-    // let value = string_to_value($('form.earnings-form input[name="value"]').val());
-    let value = $('form.earnings-form input[name="value"]').maskMoney( "unmasked" )[0]
-    console.log(value)
-    clear_form(this);
+    let value = $('form.earnings-form input[name="value"]').maskMoney("unmasked")[0]
 
-    append_earnings({
-        'id': $('tr[data-earnings-id]').length,
-        'title': title,
-        'value': value,
-        'fixed': false
-    })
+    $.ajax({
+        url: $('#save_earnings_url').val(),
+        method: 'POST',
+        beforeSend: function (request) {
+            return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+        },
+        data: {
+            'title': title,
+            'value': value,
+            'date': JSON.stringify(DATE),
+        },
+        success: function (data) {
+            console.log(data)
+            if (data.status == 'success') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
 
-    new PNotify({
-        title: 'Salvo com sucesso',
-        delay: 1000,
-        type: 'success',
-        styling: 'bootstrap3'
-    });CHART_COLORS
+                append_earnings(data.earning)
+
+                clear_form(form);
+
+            } else if (data.status == 'error') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        },
+        error: function (e) {
+        },
+    });
 })
 
 
 $('form.expense-form').on('submit', function (e) {
     e.preventDefault();
     let title = $('form.expense-form input[name="title"]').val();
-    // let value = string_to_value($('form.expense-form input[name="value"]').val());
-    let value = $('form.expense-form input[name="value"]').maskMoney( "unmasked" )[0]
-    let group = $('form.expense-form select[name="group"]').val();
+    let value = $('form.expense-form input[name="value"]').maskMoney("unmasked")[0]
+    let category = $('form.expense-form select[name="category"]').val();
     clear_form(this);
 
     append_expanse({
         'id': $('tr[data-expense-id]').length,
         'title': title,
         'value': value,
-        'group': group,
+        'category': category,
         'fixed': false
     })
 
@@ -154,52 +178,219 @@ function clear_form(form) {
     $(form).find('input[name="title"]').focus();
 }
 
-$('.table-editable').on('focusin', 'input', function () {
+$('.earnings-content .table-editable').on('focusin', 'input', function () {
     let value = this.value;
-    $(this).on('focusout', function () {
+
+    $(this).on('keyup', function (e) {
+        if (e.which == 13) {
+            $(this).off('keyup').blur();
+        }
+    })
+
+    $(this).on('focusout', function (e) {
+
         if (!this.value) {
             this.value = value;
-        };
-        $(this).off('focusout');
+        } else if (this.value != value){
+
+            let earning_id = $(this).closest('tr').attr('data-earnings-id')
+            let title = $('tr[data-earnings-id="' + earning_id + '"] input[name="title"]').val();
+            let value = $('tr[data-earnings-id="' + earning_id + '"] input[name="value"]').maskMoney("unmasked")[0]
+            
+            $.ajax({
+                url: $('#edit_earnings_url').val(),
+                method: 'POST',
+                beforeSend: function (request) {
+                    return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+                },
+                data: {
+                    'id': earning_id,
+                    'title': title,
+                    'value': value,
+                },
+                success: function (data) {
+                    console.log(data)
+                    if (data.status == 'success') {
+                        new PNotify({
+                            title: data.message_title,
+                            text: '',
+                            delay: 1000,
+                            type: 'success',
+                            styling: 'bootstrap3'
+                        });
+        
+                        $('tr[data-earnings-id="' + data.earning.id + '"] input[name="title"]').val(data.earning.title);
+                        set_mask('tr[data-earnings-id="' + data.earning.id + '"] .mask_money', data.earning.value)
+                        
+                    } else if (data.status == 'error') {
+                        new PNotify({
+                            title: data.message_title,
+                            text: '',
+                            delay: 1000,
+                            type: 'error',
+                            styling: 'bootstrap3'
+                        });
+                    }
+                },
+                error: function (e) {
+                },
+            })
+
+            let total = 0;
+            EARNINGS.forEach(function (e) {
+                if (e.id == earning_id) {
+                    e.value = $('tr[data-earnings-id="' + earning_id + '"] .mask_money').maskMoney("unmasked")[0]
+                }
+                total = total + e.value;
+            })
+    
+            $('.earnings-content .table-info .value-total').text(value_to_string(total));
+            $('.progress-bar-total-month [data-total-earnings]').attr({ 'data-total-earnings': total })
+    
+            update_progress_bar();
+
+        }
+        $(this).off('focusout').blur();
     })
 })
 
-$('.table-editable').on('click', '.trash', function () {
-    $(this).closest('tr').remove();
-    new PNotify({
-        title: 'Excluido com sucesso',
-        delay: 1000,
-        type: 'success',
-        styling: 'bootstrap3'
-    });
+$('.expense-content .table-editable').on('focusin', 'input, select', function () {
+
+    let value = this.value;
+
+    $(this).on('keyup', function (e) {
+        if (e.which == 13) {
+            $(this).off('keyup').blur();
+        }
+    })
+
+    $(this).on('focusout change', function () {
+        if (!this.value) {
+            this.value = value;
+        } else {
+            save_expense_edit(this)
+        };
+        $(this).off('focusout change').blur();
+    })
 })
 
-$('.table-editable').on('click', '.fix', function () {
+function save_expense_edit(input) {
+    if (input.name == 'value') {
+        let total = 0;
+        EXPENSES.forEach(function (e) {
+            if (e.id = input.closest('tr[data-expense-id]')) {
+                e.value = $(input).maskMoney("unmasked")[0]
+            }
+            total = total + e.value;
+        })
 
-    let message = ''
+        $('.expense-content .table-info .value-total').text(value_to_string(total));
 
-    if ($(this).hasClass('fix-active')) {
-        $(this).removeClass('fix-active')
-        message = 'Item Desfixado'
-    } else {
-        $(this).addClass('fix-active')
-        message = 'Item Fixado'
+        $('.progress-bar-total-month [data-total-expense]').attr({ 'data-total-expense': total })
+
+        update_progress_bar();
+
+    } else if (input.name == 'title') {
+
+    } else if (input.name == 'category') {
+
     }
+}
 
-    new PNotify({
-        title: message,
-        delay: 1000,
-        type: 'success',
-        styling: 'bootstrap3',
-    });
+$('.earnings-content .table-editable').on('click', '.trash', function () {
+
+    let earning_id = $(this).closest('tr').attr('data-earnings-id')
+
+    $.ajax({
+        url: $('#remove_earnings_url').val(),
+        method: 'POST',
+        beforeSend: function (request) {
+            return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+        },
+        data: {
+            'id': earning_id,
+        },
+        success: function (data) {
+            console.log(data)
+            if (data.status == 'success') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+
+                $('tr[data-earnings-id="' + data.earning_id + '"]').remove();
+
+            } else if (data.status == 'error') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        },
+        error: function (e) {
+        },
+    })
 })
 
+$('.earnings-content .table-editable').on('click', '.fix', function () {
+
+    let earning_id = $(this).closest('tr').attr('data-earnings-id')
+
+    let fixed =  !$(this).hasClass('fix-active') ? true : false
+
+    $.ajax({
+        url: $('#fix_earnings_url').val(),
+        method: 'POST',
+        beforeSend: function (request) {
+            return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+        },
+        data: {
+            'id': earning_id,
+            'fixed': fixed
+        },
+        success: function (data) {
+            console.log(data)
+            if (data.status == 'success') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+
+                if (data.earning.fixed=='true') {
+                    $('tr[data-earnings-id="' + data.earning.id + '"] .fix').addClass('fix-active');
+                } else {
+                    $('tr[data-earnings-id="' + data.earning.id + '"] .fix').removeClass('fix-active');
+                }
+
+            } else if (data.status == 'error') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        },
+        error: function (e) {
+        },
+    })
+})
 
 function mount_charts_earnings() {
 
     if (typeof (Chart) === 'undefined') { return; }
 
-    let labels=[], data=[], colors=[];
+    let labels = [], data = [], colors = [];
     EARNINGS.forEach(function (e, i) {
         labels.push(e.title)
         data.push(e.value)
@@ -249,10 +440,10 @@ function mount_charts_earnings() {
 
 function mount_charts_expense() {
 
-    
+
     if ($('#expense_chart').length) {
-        
-        let labels=[], data=[], colors=[];
+
+        let labels = [], data = [], colors = [];
         EXPENSES.forEach(function (e, i) {
             labels.push(e.title)
             data.push(e.value)
@@ -263,7 +454,7 @@ function mount_charts_expense() {
             type: 'doughnut',
             tooltipFillColor: "rgba(51, 51, 51, 0.55)",
             data: {
-                labels:labels,
+                labels: labels,
                 datasets: [{
                     data: data,
                     backgroundColor: colors,
@@ -299,14 +490,17 @@ function mount_charts_expense() {
     }
 }
 
-function mount_table() {
-    EARNINGS.forEach(function (e) {
-        append_earnings(e)
-    })
-
-    EXPENSES.forEach(function (e) {
-        append_expanse(e)
-    })
+function mount_table(earnings, expense) {
+    if (earnings) {
+        earnings.forEach(function (e) {
+            append_earnings(e)
+        })
+    }
+    if (expense) {
+        expense.expense.forEach(function (e) {
+            append_expanse(e, expense.category)
+        })
+    }
 }
 
 function append_earnings(earnings) {
@@ -320,35 +514,38 @@ function append_earnings(earnings) {
         </td>\
     </tr>');
     set_mask('.earnings-tbody tr[data-earnings-id="' + earnings.id + '"] .mask_money', earnings.value)
-    if (earnings.fixed) {
-        $('.earnings-tbody tr[data-earnings-id="' + earnings.id + '"] .fix').addClass('fix-active');
-    }
+
+    earnings.fixed ? $('.earnings-tbody tr[data-earnings-id="' + earnings.id + '"] .fix').addClass('fix-active') : '';
+
     EARNINGS.push(earnings)
     // mount_charts_earnings();
 
-    let total=0;
-    EARNINGS.forEach(function(e){
+    let total = 0;
+    EARNINGS.forEach(function (e) {
         total = total + e.value;
     })
 
     $('.earnings-content .table-info .value-total').text(value_to_string(total));
 
-    $('.progress-bar-total-month [data-total-earnings]').attr({'data-total-earnings':total})
+    $('.progress-bar-total-month [data-total-earnings]').attr({ 'data-total-earnings': total })
 
     update_progress_bar();
 }
 
-function append_expanse(expense) {
+function append_expanse(expense, category) {
+
+    let option=''
+    category.forEach(function (e) {
+        option = option + "<option value="+e.id+">"+e.title+"</option>"
+    })
+
     $('.expense-tbody').prepend('\
             <tr data-expense-id="'+ expense.id + '">\
                 <td><input type="text" name="title" class="" value="'+ expense.title + '" autocomplete="false"></td>\
                 <td><input type="text" name="value" placeholder="R$ 0,00" class="mask_money" value="" autocomplete="false"></td>\
                 <td>\
-                    <select class="" name="group">\
-                        <option value="Alimentação">Alimentação</option>\
-                        <option value="Estudo">Estudo</option>\
-                        <option value="Transporte">Transporte</option>\
-                        <option value="Moradia">Moradia</option>\
+                    <select class="" name="category">\
+                        '+ option +'\
                     </select>\
                 </td>\
                 <td class="actions">\
@@ -357,46 +554,66 @@ function append_expanse(expense) {
                 </td>\
             </tr>');
 
-
-    // $('.expense-tbody tr[data-expense-id="' + expense.id + '"] .mask_money').maskMoney({
-    //     prefix:'R$ ',
-    //     decimal: ",", 
-    //     thousands: "."
-    // })
-
-    $('.expense-tbody tr[data-expense-id="' + expense.id + '"] select').val(expense.group)
+    $('.expense-tbody tr[data-expense-id="' + expense.id + '"] select').val(expense.category)
     set_mask('.expense-tbody tr[data-expense-id="' + expense.id + '"] .mask_money', expense.value)
-    if (expense.fixed) {
-        $('.expense-tbody tr[data-expense-id="' + expense.id + '"] .fix').addClass('fix-active');
-    }
+    expense.fixed ? $('.expense-tbody tr[data-expense-id="' + expense.id + '"] .fix').addClass('fix-active') : '';
+
     EXPENSES.push(expense);
     // mount_charts_expense();
 
-    let total=0;
-    EXPENSES.forEach(function(e){
+    let total = 0;
+    EXPENSES.forEach(function (e) {
         total = total + e.value;
     })
 
     $('.expense-content .table-info .value-total').text(value_to_string(total));
 
-    $('.progress-bar-total-month [data-total-expense]').attr({'data-total-expense':total})
+    $('.progress-bar-total-month [data-total-expense]').attr({ 'data-total-expense': total })
 
     update_progress_bar();
 }
 
-
-function update_progress_bar(){
+function update_progress_bar() {
 
     let earnings = $('.progress-bar-total-month [data-total-earnings]').attr('data-total-earnings')
-    let expense =  $('.progress-bar-total-month [data-total-expense]').attr('data-total-expense')
+    let expense = $('.progress-bar-total-month [data-total-expense]').attr('data-total-expense')
 
-    $('.progress-bar-total-month .progress-bar').attr({
-        'data-transitiongoal': (expense*100)/earnings>100 ? 100 : (expense*100)/earnings,
-        'data-original-title': Math.trunc((expense*100)/earnings>100 ? 100 : (expense*100)/earnings)+'%'}
-        ).progressbar();
+    $('.progress-bar-total-month [data-total-expense]').attr({
+        'data-transitiongoal': (expense * 100) / earnings > 100 ? 100 : (expense * 100) / earnings,
+        'data-original-title': Math.trunc((expense * 100) / earnings > 100 ? 100 : (expense * 100) / earnings) + '%'
+    }
+    ).progressbar();
 }
 
+function ajax_get_finances() {
+    $.ajax({
+        url: $('#get_finances_url').val(),
+        method: 'POST',
+        beforeSend: function (request) {
+            return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+        },
+        data: {
+            'date': JSON.stringify(DATE),
+        },
+        success: function (data) {
+            if (data.status == 'success') {
+                clear_data();
+                mount_table(data.earnings, data.expense);
+            } else if (data.status == 'error') {
+            }
+        },
+        error: function (e) {
+        },
+    });
+}
 
-function log(text){
-    return console.log(text);
+function clear_data() {
+    $('.earnings-tbody, .expense-tbody').html('')
+    $('.earnings-content .table-info .value-total, .expense-content .table-info .value-total').text('---')
+
+    $('.progress-bar-total-month [data-total-earnings]').attr({ 'data-total-earnings': 0 })
+    $('.progress-bar-total-month [data-total-expense]').attr({ 'data-total-expense': 0, 'data-original-title': '0%' }).progressbar();
+
+    EXPENSES = []
+    EARNINGS = []
 }
