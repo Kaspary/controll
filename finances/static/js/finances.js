@@ -76,7 +76,7 @@ var EXPENSES = [
 $(document).ready(function () {
     $('.calendar-select').calendar({
         type: 'month',
-        maxDate: new Date(),
+        maxDate: new Date().addMonths(1),
         minDate: new Date('2019, 1'),
         text: {
             days: ["D", "S", "T", "Q", "Q", "S", "S"],
@@ -103,7 +103,6 @@ function changeDate(date) {
 $('form.earnings-form').on('submit', function (e) {
     e.preventDefault();
     let form = this;
-
     let title = $('form.earnings-form input[name="title"]').val();
     let value = $('form.earnings-form input[name="value"]').maskMoney("unmasked")[0]
 
@@ -128,8 +127,9 @@ $('form.earnings-form').on('submit', function (e) {
                     type: 'success',
                     styling: 'bootstrap3'
                 });
-
-                append_earnings(data.earning)
+                
+                set_total_earning(data.earning.total)
+                append_earnings(data.earning.earning)
 
                 clear_form(form);
 
@@ -151,24 +151,52 @@ $('form.earnings-form').on('submit', function (e) {
 
 $('form.expense-form').on('submit', function (e) {
     e.preventDefault();
+    let form = this;
     let title = $('form.expense-form input[name="title"]').val();
     let value = $('form.expense-form input[name="value"]').maskMoney("unmasked")[0]
     let category = $('form.expense-form select[name="category"]').val();
-    clear_form(this);
 
-    append_expanse({
-        'id': $('tr[data-expense-id]').length,
-        'title': title,
-        'value': value,
-        'category': category,
-        'fixed': false
-    })
+    $.ajax({
+        url: $('#save_expense_url').val(),
+        method: 'POST',
+        beforeSend: function (request) {
+            return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+        },
+        data: {
+            'title': title,
+            'value': value,
+            'category': category,
+            'date': JSON.stringify(DATE),
+        },
+        success: function (data) {
+            console.log(data)
+            if (data.status == 'success') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
 
-    new PNotify({
-        title: 'Salvo com sucesso',
-        delay: 1000,
-        type: 'success',
-        styling: 'bootstrap3'
+                set_total_expanse(data.expense.total)
+
+                append_expanse(data.expense.expense, data.expense.category)
+
+                clear_form(form);
+
+            } else if (data.status == 'error') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        },
+        error: function (e) {
+        },
     });
 })
 
@@ -207,6 +235,7 @@ $('.earnings-content .table-editable').on('focusin', 'input', function () {
                     'id': earning_id,
                     'title': title,
                     'value': value,
+                    'date': JSON.stringify(DATE),
                 },
                 success: function (data) {
                     console.log(data)
@@ -218,9 +247,10 @@ $('.earnings-content .table-editable').on('focusin', 'input', function () {
                             type: 'success',
                             styling: 'bootstrap3'
                         });
-        
-                        $('tr[data-earnings-id="' + data.earning.id + '"] input[name="title"]').val(data.earning.title);
-                        set_mask('tr[data-earnings-id="' + data.earning.id + '"] .mask_money', data.earning.value)
+                        
+                        set_total_earning(data.earning.total)
+                        $('tr[data-earnings-id="' + data.earning.earning.id + '"] input[name="title"]').val(data.earning.earning.title);
+                        set_mask('tr[data-earnings-id="' + data.earning.earning.id + '"] .mask_money', data.earning.earning.value)
                         
                     } else if (data.status == 'error') {
                         new PNotify({
@@ -267,35 +297,75 @@ $('.expense-content .table-editable').on('focusin', 'input, select', function ()
     $(this).on('focusout change', function () {
         if (!this.value) {
             this.value = value;
-        } else {
-            save_expense_edit(this)
+        } else if (this.value != value){
+
+
+            let expense_id = $(this).closest('tr').attr('data-expense-id')
+            let title = $('tr[data-expense-id="' + expense_id + '"] input[name="title"]').val();
+            let value = $('tr[data-expense-id="' + expense_id + '"] input[name="value"]').maskMoney("unmasked")[0]
+            let category = $('tr[data-expense-id="' + expense_id + '"] select[name="category"]').val()
+            
+            $.ajax({
+                url: $('#edit_expense_url').val(),
+                method: 'POST',
+                beforeSend: function (request) {
+                    return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+                },
+                data: {
+                    'id': expense_id,
+                    'title': title,
+                    'value': value,
+                    'category':category,
+                    'date': JSON.stringify(DATE),
+                },
+                success: function (data) {
+                    console.log(data)
+                    if (data.status == 'success') {
+                        new PNotify({
+                            title: data.message_title,
+                            text: '',
+                            delay: 1000,
+                            type: 'success',
+                            styling: 'bootstrap3'
+                        });
+                        
+                        set_total_expanse(data.expense.total)
+                        $('tr[data-expense-id="' + data.expense.expense.id + '"] input[name="title"]').val(data.expense.expense.title);
+                        $('tr[data-expense-id="' + data.expense.expense.id + '"] select[name="category"]').val(data.expense.expense.category);
+                        set_mask('tr[data-expense-id="' + data.expense.expense.id + '"] .mask_money', data.expense.expense.value)
+                        
+                    } else if (data.status == 'error') {
+                        new PNotify({
+                            title: data.message_title,
+                            text: '',
+                            delay: 1000,
+                            type: 'error',
+                            styling: 'bootstrap3'
+                        });
+                    }
+                },
+                error: function (e) {
+                },
+            })
+
+            let total = 0;
+            EXPENSES.forEach(function (e) {
+                if (e.id == expense_id) {
+                    e.value = $('tr[data-expense-id="' + expense_id + '"] .mask_money').maskMoney("unmasked")[0]
+                }
+                total = total + e.value;
+            })
+
+            $('.expense-content .table-info .value-total').text(value_to_string(total));
+
+            $('.progress-bar-total-month [data-total-expense]').attr({ 'data-total-expense': total })
+
+            update_progress_bar();
+
         };
         $(this).off('focusout change').blur();
     })
 })
-
-function save_expense_edit(input) {
-    if (input.name == 'value') {
-        let total = 0;
-        EXPENSES.forEach(function (e) {
-            if (e.id = input.closest('tr[data-expense-id]')) {
-                e.value = $(input).maskMoney("unmasked")[0]
-            }
-            total = total + e.value;
-        })
-
-        $('.expense-content .table-info .value-total').text(value_to_string(total));
-
-        $('.progress-bar-total-month [data-total-expense]').attr({ 'data-total-expense': total })
-
-        update_progress_bar();
-
-    } else if (input.name == 'title') {
-
-    } else if (input.name == 'category') {
-
-    }
-}
 
 $('.earnings-content .table-editable').on('click', '.trash', function () {
 
@@ -309,6 +379,50 @@ $('.earnings-content .table-editable').on('click', '.trash', function () {
         },
         data: {
             'id': earning_id,
+            'date': JSON.stringify(DATE),
+        },
+        success: function (data) {
+            console.log(data)
+            if (data.status == 'success') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+                
+                set_total_earning(data.earning.total)
+                $('tr[data-earnings-id="' + data.earning.earning.id + '"]').remove();
+
+            } else if (data.status == 'error') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        },
+        error: function (e) {
+        },
+    })
+})
+
+$('.expense-content .table-editable').on('click', '.trash', function () {
+
+    let expense_id = $(this).closest('tr').attr('data-expense-id')
+
+    $.ajax({
+        url: $('#remove_expense_url').val(),
+        method: 'POST',
+        beforeSend: function (request) {
+            return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+        },
+        data: {
+            'id': expense_id,
+            'date': JSON.stringify(DATE),
         },
         success: function (data) {
             console.log(data)
@@ -321,7 +435,8 @@ $('.earnings-content .table-editable').on('click', '.trash', function () {
                     styling: 'bootstrap3'
                 });
 
-                $('tr[data-earnings-id="' + data.earning_id + '"]').remove();
+                set_total_expanse(data.expense.total)
+                $('tr[data-expense-id="' + data.expense.expense.id + '"]').remove();
 
             } else if (data.status == 'error') {
                 new PNotify({
@@ -365,10 +480,58 @@ $('.earnings-content .table-editable').on('click', '.fix', function () {
                     styling: 'bootstrap3'
                 });
 
-                if (data.earning.fixed=='true') {
-                    $('tr[data-earnings-id="' + data.earning.id + '"] .fix').addClass('fix-active');
+                if (data.earning.earning.fixed=='true') {
+                    $('tr[data-earnings-id="' + data.earning.earning.id + '"] .fix').addClass('fix-active');
                 } else {
-                    $('tr[data-earnings-id="' + data.earning.id + '"] .fix').removeClass('fix-active');
+                    $('tr[data-earnings-id="' + data.earning.earning.id + '"] .fix').removeClass('fix-active');
+                }
+
+            } else if (data.status == 'error') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'error',
+                    styling: 'bootstrap3'
+                });
+            }
+        },
+        error: function (e) {
+        },
+    })
+})
+
+$('.expense-content .table-editable').on('click', '.fix', function () {
+
+    let expense_id = $(this).closest('tr').attr('data-expense-id')
+
+    let fixed =  !$(this).hasClass('fix-active') ? true : false
+
+    $.ajax({
+        url: $('#fix_expense_url').val(),
+        method: 'POST',
+        beforeSend: function (request) {
+            return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+        },
+        data: {
+            'id': expense_id,
+            'fixed': fixed
+        },
+        success: function (data) {
+            console.log(data)
+            if (data.status == 'success') {
+                new PNotify({
+                    title: data.message_title,
+                    text: '',
+                    delay: 1000,
+                    type: 'success',
+                    styling: 'bootstrap3'
+                });
+
+                if (data.expense.expense.fixed=='true') {
+                    $('tr[data-expense-id="' + data.expense.expense.id + '"] .fix').addClass('fix-active');
+                } else {
+                    $('tr[data-expense-id="' + data.expense.expense.id + '"] .fix').removeClass('fix-active');
                 }
 
             } else if (data.status == 'error') {
@@ -492,7 +655,7 @@ function mount_charts_expense() {
 
 function mount_table(earnings, expense) {
     if (earnings) {
-        earnings.forEach(function (e) {
+        earnings.earnings.forEach(function (e) {
             append_earnings(e)
         })
     }
@@ -517,19 +680,6 @@ function append_earnings(earnings) {
 
     earnings.fixed ? $('.earnings-tbody tr[data-earnings-id="' + earnings.id + '"] .fix').addClass('fix-active') : '';
 
-    EARNINGS.push(earnings)
-    // mount_charts_earnings();
-
-    let total = 0;
-    EARNINGS.forEach(function (e) {
-        total = total + e.value;
-    })
-
-    $('.earnings-content .table-info .value-total').text(value_to_string(total));
-
-    $('.progress-bar-total-month [data-total-earnings]').attr({ 'data-total-earnings': total })
-
-    update_progress_bar();
 }
 
 function append_expanse(expense, category) {
@@ -554,35 +704,44 @@ function append_expanse(expense, category) {
                 </td>\
             </tr>');
 
-    $('.expense-tbody tr[data-expense-id="' + expense.id + '"] select').val(expense.category)
+    $('.expense-tbody tr[data-expense-id="' + expense.id + '"] select[name="category"]').val(expense.category)
     set_mask('.expense-tbody tr[data-expense-id="' + expense.id + '"] .mask_money', expense.value)
     expense.fixed ? $('.expense-tbody tr[data-expense-id="' + expense.id + '"] .fix').addClass('fix-active') : '';
+}
 
-    EXPENSES.push(expense);
-    // mount_charts_expense();
-
-    let total = 0;
-    EXPENSES.forEach(function (e) {
-        total = total + e.value;
-    })
-
+function set_total_expanse(total){
     $('.expense-content .table-info .value-total').text(value_to_string(total));
-
     $('.progress-bar-total-month [data-total-expense]').attr({ 'data-total-expense': total })
-
     update_progress_bar();
 }
+
+function set_total_earning(total){
+    $('.earnings-content .table-info .value-total').text(value_to_string(total));
+    $('.progress-bar-total-month [data-total-earnings]').attr({ 'data-total-earnings': total })
+    update_progress_bar();
+}
+
 
 function update_progress_bar() {
 
     let earnings = $('.progress-bar-total-month [data-total-earnings]').attr('data-total-earnings')
     let expense = $('.progress-bar-total-month [data-total-expense]').attr('data-total-expense')
+    
+    let data_transitiongoal = 0
+    let data_original_title = '0%'
+    
+    if ((expense*100)/earnings<=100){
+        data_transitiongoal = (expense*100)/earnings
+        data_original_title = Math.trunc((expense*100)/earnings) + '%'
+    } else if ((expense*100)/earnings >100){
+        data_transitiongoal = 100
+        data_original_title = '100%'
+    }
 
     $('.progress-bar-total-month [data-total-expense]').attr({
-        'data-transitiongoal': (expense * 100) / earnings > 100 ? 100 : (expense * 100) / earnings,
-        'data-original-title': Math.trunc((expense * 100) / earnings > 100 ? 100 : (expense * 100) / earnings) + '%'
-    }
-    ).progressbar();
+        'data-transitiongoal': data_transitiongoal,
+        'data-original-title': data_original_title
+    }).progressbar();
 }
 
 function ajax_get_finances() {
@@ -598,6 +757,8 @@ function ajax_get_finances() {
         success: function (data) {
             if (data.status == 'success') {
                 clear_data();
+                set_total_earning(data.earnings.total)
+                set_total_expanse(data.expense.total)
                 mount_table(data.earnings, data.expense);
             } else if (data.status == 'error') {
             }

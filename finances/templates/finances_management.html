@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% block content %} {% load static %}
 
 <input id="csrf_token_url" type="hidden" value="{{ csrf_token }}" />
 <input id="user_id" type="hidden" value="{{ user.pk }}" />
@@ -10,9 +10,10 @@
 <input id="fix_earnings_url" type="hidden" value="{% url 'finances:fix_earnings' %}" />
 <input id="remove_earnings_url" type="hidden" value="{% url 'finances:remove_earnings' %}" />
 
-<input id="save_expanse_url" type="hidden" value="{% url 'finances:save_expanse' %}" />
-<input id="edit_expanse_url" type="hidden" value="{% url 'finances:edit_expanse' %}" />
-<input id="remove_expanse_url" type="hidden" value="{% url 'finances:remove_expanse' %}" />
+<input id="save_expense_url" type="hidden" value="{% url 'finances:save_expense' %}" />
+<input id="edit_expense_url" type="hidden" value="{% url 'finances:edit_expense' %}" />
+<input id="fix_expense_url" type="hidden" value="{% url 'finances:fix_expense' %}" />
+<input id="remove_expense_url" type="hidden" value="{% url 'finances:remove_expense' %}" />
 
 <!-- page content -->
 <div class="right_col" role="main">
@@ -66,12 +67,12 @@
                             <div class="form-group earnings-input">
                                 <div class="col-sm-6">
                                     <input type="text" name="title" placeholder="Nome" class="form-control"
-                                        required="required">
+                                        autocomplete="off" required="required">
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="input-group">
                                         <input type="text" name="value" placeholder="R$ 0,00"
-                                            class="form-control mask_money" required="required">
+                                        autocomplete="off" class="form-control mask_money" required="required">
                                         <span class="input-group-btn">
                                             <button type="submit" class="btn btn-primary"><i
                                                     class="fa fa-check"></i></button>
@@ -145,11 +146,11 @@
                             <div class="form-group expense-input">
                                 <div class="input col-sm-4">
                                     <input type="text" name="title" placeholder="Nome" class="form-control"
-                                        required="required">
+                                    autocomplete="off" required="required">
                                 </div>
                                 <div class="input col-sm-3">
                                     <input type="text" name="value" placeholder="R$ 0,00"
-                                        class="form-control mask_money" required="required">
+                                    autocomplete="off" class="form-control mask_money" required="required">
                                 </div>
 
                                 <div class="btn-group input col-sm-5" required="required">
@@ -213,4 +214,17 @@
 </div>
 <!-- /page content -->
 
+{% endblock %}
+
+{% block scripts %}
+
+<!-- jquery mask -->
+<script src="{% static 'js/jquery.mask_money.min.js' %}"></script>
+<script src="{% static 'js/mask_class.js' %}"></script>
+
+<!-- Date Input (https://codepen.io/SaadRegal/pen/ZOABQr)-->
+<script src="{% static 'js/semantic-datepicker.min.js' %}"></script>
+
+<!-- Me JS -->
+<script src="{% static 'js/finances.js' %}"></script>
 {% endblock %}

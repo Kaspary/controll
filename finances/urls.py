@@ -13,7 +13,8 @@ urlpatterns = [
     url(r'^fix_earnings', fix_earnings, name='fix_earnings'),
     url(r'^remove_earnings', remove_earnings, name='remove_earnings'),
 
-    url(r'^save_expanse', save_expanse, name='save_expanse'),
-    url(r'^edit_expanse', edit_expanse, name='edit_expanse'),
-    url(r'^remove_expanse', remove_expanse, name='remove_expanse'),
+    url(r'^save_expense', save_expense, name='save_expense'),
+    url(r'^edit_expense', edit_expense, name='edit_expense'),
+    url(r'^fix_expense', fix_expense, name='fix_expense'),
+    url(r'^remove_expense', remove_expense, name='remove_expense'),
 ]

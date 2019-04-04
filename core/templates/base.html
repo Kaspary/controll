@@ -295,7 +295,7 @@
 
         <!-- footer content -->
         <footer>
-          <div class="pull-right">Controle
+          <div class="pull-right">Controll
             <!--<a href="https://colorlib.com">Colorlib</a>-->
           </div>
           <div class="clearfix"></div>
@@ -345,21 +345,9 @@
     <!-- Custom Theme Scripts -->
     <script src="{% static 'build/js/custom.min.js' %}"></script>
 
-    <!-- jquery mask -->
-    <script src="{% static 'js/jquery.mask.min.js' %}"></script>
-    <script src="{% static 'js/jquery.mask_money.min.js' %}"></script>
-    <script src="{% static 'js/mask_class.js' %}"></script>
-
-    <!-- Date Input (https://codepen.io/SaadRegal/pen/ZOABQr)-->
-    <script src="{% static 'js/semantic-datepicker.min.js' %}"></script>
-
     <!-- PNotify -->
     <script src="{% static 'vendors/pnotify/dist/pnotify.js' %}"></script>
     <script src="{% static 'vendors/pnotify/dist/pnotify.buttons.js' %}"></script>
-
-    <!-- Me JS -->
-    <script src="{% static 'js/main.js' %}"></script>
-
-
+    {% block scripts %} {% endblock %}
   </body>
 </html>
