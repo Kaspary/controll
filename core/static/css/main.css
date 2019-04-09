@@ -19,6 +19,10 @@ body{
     width: inherit;
 }
 
+.sidebar-footer.hidden-small a:hover{
+    color: #fff;
+}
+
 /*END CSS MODIFICATIONS*/
 
 /*CSS PROGRESS-BAR TOTAL MONTH*/
@@ -147,6 +151,7 @@ body{
     min-width: 100px;
    -webkit-appearance: none;  /* Remove estilo padrão do Chrome */
 }
+
 /*END CSS TABLE EDITABLE*/
 
 
@@ -190,4 +195,28 @@ body{
 .table-info .chart-info{
     padding:20px;
 }
-/*END CSS CHART*/
+/* END CSS CHART */
+
+/* CSS MENU */
+.sidebar-footer.hidden-small .menu-active{
+    color: #fff;
+    background: #425567;
+}
+/* END CSS MENU */
+
+
+/*CSS CONFIRM NOTIFY*/
+/* .btn-confirm{
+    color: #ffffff;
+    background: transparent;
+    border: transparent;
+}
+
+.btn-confirm:focus,
+.btn-confirm:active,
+.btn-confirm:hover{
+    color: #ffffff!important;
+    background: #3498dbe0!important;
+
+} */
+/*END CSS CONFIRM NOTIFY*/

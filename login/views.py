@@ -29,5 +29,5 @@ def _login_method(request):
         login(request, user)
         return HttpResponseRedirect(reverse('core:index'))
     else:
-        context = {'message': 'Usuário ou senha não correspondem'}
+        context = {'message': '*Usuário ou senha não correspondem'}
         return render(request, 'login.html', context)

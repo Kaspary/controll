@@ -17,4 +17,9 @@ urlpatterns = [
     url(r'^edit_expense', edit_expense, name='edit_expense'),
     url(r'^fix_expense', fix_expense, name='fix_expense'),
     url(r'^remove_expense', remove_expense, name='remove_expense'),
+
+    url(r'^get_expenses_category', get_expenses_category, name='get_expenses_category'),
+    url(r'^save_category_expense', save_category_expense, name='save_category_expense'),
+    url(r'^edit_category_expense', edit_category_expense, name='edit_category_expense'),
+    url(r'^remove_category_expense', remove_category_expense, name='remove_category_expense'),
 ]

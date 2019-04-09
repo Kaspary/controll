@@ -22,13 +22,12 @@ class Expense(models.Model):
     value = models.FloatField()
     date = models.DateTimeField()
     fixed = models.BooleanField(default=False)
-    category = models.ForeignKey(ExpensesCategory, null=True, on_delete=models.CASCADE)
+    category = models.ForeignKey(ExpensesCategory, null=True, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
-
 
 class Earnings(models.Model):
     title = models.CharField(max_length=50)

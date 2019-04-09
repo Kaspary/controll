@@ -34,12 +34,12 @@
     <!--<link href="https://cdn.rawgit.com/mdehoog/Semantic-UI/6e6d051d47b598ebab05857545f242caf2b4b48c/dist/semantic.min.css" rel="stylesheet" type="text/css" />-->
 
     <!-- PNotify -->
-    <link href="{% static 'vendors/pnotify/dist/pnotify.css' %}" rel="stylesheet">
-    <link href="{% static 'vendors/pnotify/dist/pnotify.buttons.css' %}" rel="stylesheet">
-    <link href="{% static 'vendors/pnotify/dist/pnotify.nonblock.css' %}" rel="stylesheet">
+    <link href="{% static 'vendors/pnotify/dist/pnotify.custom.min.css' %}" rel="stylesheet">
 
     <!-- Me CSS -->
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+    {% block style %} {% endblock %}
 
   </head>
 
@@ -181,7 +181,7 @@
               <a data-toggle="tooltip" data-placement="top" title="Tela Cheia">
                 <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
               </a>
-              <a data-toggle="tooltip" data-placement="top" title="Bloquear">
+              <a id="hide_values" data-toggle="tooltip" data-placement="top" title="Esconder Valores">
                 <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
               </a>
               <a data-toggle="tooltip" data-placement="top" title="Sair" href="{% url 'login:logout' %}">
@@ -346,8 +346,11 @@
     <script src="{% static 'build/js/custom.min.js' %}"></script>
 
     <!-- PNotify -->
-    <script src="{% static 'vendors/pnotify/dist/pnotify.js' %}"></script>
-    <script src="{% static 'vendors/pnotify/dist/pnotify.buttons.js' %}"></script>
+    <script src="{% static 'vendors/pnotify/dist/pnotify.custom.min.js' %}"></script>
+
+    <!-- Me Script -->
+    <script src="{% static 'js/hide_values.js' %}"></script>
+
     {% block scripts %} {% endblock %}
   </body>
 </html>

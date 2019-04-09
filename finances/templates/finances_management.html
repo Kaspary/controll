@@ -15,6 +15,18 @@
 <input id="fix_expense_url" type="hidden" value="{% url 'finances:fix_expense' %}" />
 <input id="remove_expense_url" type="hidden" value="{% url 'finances:remove_expense' %}" />
 
+<input id="get_expenses_category_url" type="hidden" value="{% url 'finances:get_expenses_category' %}" />
+<input id="save_category_expense_url" type="hidden" value="{% url 'finances:save_category_expense' %}" />
+<input id="edit_category_expense_url" type="hidden" value="{% url 'finances:edit_category_expense' %}" />
+<input id="remove_category_expense_url" type="hidden" value="{% url 'finances:remove_category_expense' %}" />
+
+{% block style %}
+
+<!-- Sweet Alert -->
+<link href="{% static 'vendors/SwetAlert/sweetalert2.min.css' %}" rel="stylesheet">
+
+{% endblock %}
+
 <!-- page content -->
 <div class="right_col" role="main">
 
@@ -39,9 +51,11 @@
     </div>
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="progress-bar-total-month">
-                <div class="progress progress_sm" data-toggle="tooltip" data-placement="bottom" data-total-earnings="0" data-original-title="">
-                    <div class="progress-bar" data-toggle="tooltip" data-placement="bottom" data-original-title="" role="progressbar" data-total-expense="0" data-transitiongoal=""></div>
+            <div class="progress-bar-total-month hide-values-chart">
+                <div class="progress progress_sm" data-toggle="tooltip" data-placement="bottom" data-total-earnings="0"
+                    data-original-title="">
+                    <div class="progress-bar" data-toggle="tooltip" data-placement="bottom" data-original-title=""
+                        role="progressbar" data-total-expense="0" data-transitiongoal=""></div>
                 </div>
             </div>
         </div>
@@ -71,8 +85,8 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="input-group">
-                                        <input type="text" name="value" placeholder="R$ 0,00"
-                                        autocomplete="off" class="form-control mask_money" required="required">
+                                        <input type="text" name="value" placeholder="R$ 0,00" autocomplete="off"
+                                            class="form-control mask_money" required="required">
                                         <span class="input-group-btn">
                                             <button type="submit" class="btn btn-primary"><i
                                                     class="fa fa-check"></i></button>
@@ -108,11 +122,11 @@
                             <tbody>
                                 <tr>
                                     <td><i class="fa fa-circle"></i>Total</td>
-                                    <td class="value-total"> --- </td>
+                                    <td class="hide-values value-total"> --- </td>
                                 </tr>
                                 <tr>
-                                    <!-- <td><i class="fa fa-circle"></i></td> -->
-                                    <!-- <td</td> -->
+                                    <td><i class="fa fa-circle"></i>Saldo</td>
+                                    <td class="hide-values value-balance"> --- </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -146,18 +160,16 @@
                             <div class="form-group expense-input">
                                 <div class="input col-sm-4">
                                     <input type="text" name="title" placeholder="Nome" class="form-control"
-                                    autocomplete="off" required="required">
+                                        autocomplete="off" required="required">
                                 </div>
                                 <div class="input col-sm-3">
-                                    <input type="text" name="value" placeholder="R$ 0,00"
-                                    autocomplete="off" class="form-control mask_money" required="required">
+                                    <input type="text" name="value" placeholder="R$ 0,00" autocomplete="off"
+                                        class="form-control mask_money" required="required">
                                 </div>
 
                                 <div class="btn-group input col-sm-5" required="required">
                                     <select class="form-control" name="category">
-                                        {% for c in system_user.expense_category.all %}
-                                            <option value="{{c.pk}}">{{c.title}}</option>
-                                        {% endfor %}
+                                        <!-- Option here -->
                                     </select>
 
                                     <span class="input-group-btn">
@@ -170,12 +182,12 @@
                         </form>
                         <div class="divider-dashed"></div>
 
-                        <table class="table table-striped table-editable">
+                        <table id="table_expenses" class="table table-striped table-editable">
                             <thead>
                                 <tr>
                                     <th>Título</th>
                                     <th>Valor</th>
-                                    <th>Grupo</th>
+                                    <th>Categoria</th>
                                     <th class="head-actions">Ações</th>
                                 </tr>
                             </thead>
@@ -191,11 +203,16 @@
                             <tbody>
                                 <tr>
                                     <td><i class="fa fa-circle"></i>Total</td>
-                                    <td class="value-total"> --- </td>
+                                    <td class="hide-values value-total"> --- </td>
                                 </tr>
                                 <tr>
-                                    <!-- <td><i class="fa fa-circle"></i></td> -->
-                                    <!-- <td</td> -->
+                                    <td><i class="fa fa-circle"></i>Saldo</td>
+                                    <td class="hide-values value-balance"> --- </td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa fa-circle"></i>Categorias</td>
+                                    <td class="category-edit" data-toggle="modal" data-target=".modal-category-edit"><a
+                                            href="#!">Editar</a></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -214,6 +231,55 @@
 </div>
 <!-- /page content -->
 
+
+<!-- Small modal -->
+<div class="modal fade modal-category-edit" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel2">Categorias de Gastos</h4>
+            </div>
+            <div class="modal-body">
+                <form class="category-expense-form" data-parsley-validate>
+                    <div class="form-group category-expense-input">
+                        <div class="input-group">
+                            <input type="text" name="title" placeholder="Nome do grupo" autocomplete="off"
+                                class="form-control" required="required">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+                <div class="divider-dashed"></div>
+                <table class="table table-striped table-editable">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th class="head-actions">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="category-expense-tbody">
+                        <!-- Table here -->
+                    </tbody>
+                    <tfoot>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-default">Sair</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- /modals -->
+
+
 {% endblock %}
 
 {% block scripts %}
@@ -225,6 +291,11 @@
 <!-- Date Input (https://codepen.io/SaadRegal/pen/ZOABQr)-->
 <script src="{% static 'js/semantic-datepicker.min.js' %}"></script>
 
+<!-- Sweet Alert -->
+<script src="{% static 'vendors/SwetAlert/sweetalert2.min.js' %}"></script>
+
+
 <!-- Me JS -->
 <script src="{% static 'js/finances.js' %}"></script>
+
 {% endblock %}

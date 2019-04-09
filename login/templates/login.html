@@ -18,9 +18,12 @@
     <link href="{% static 'vendors/nprogress/nprogress.css' %}" rel="stylesheet">
     <!-- Animate.css -->
     <link href="{% static 'vendors/animate.css/animate.min.css' %}" rel="stylesheet">
-
     <!-- Custom Theme Style -->
     <link href="{% static 'build/css/custom.min.css' %}" rel="stylesheet">
+
+    <!-- Login.css -->
+    <link href="{% static 'css/login.css' %}" rel="stylesheet">
+
   </head>
 
   <body class="login">
@@ -40,9 +43,12 @@
               <div>
                 <input type="password" name="password" class="form-control" placeholder="Senha" required="" />
               </div>
+              <div class="message-login">
+                <p>{{ message }}</p>
+              </div>
               <div>
-                <!--<button type="submit">Entrar</button>-->
-                <a class="btn btn-default submit" onclick="document.login.submit()">Entrar</a>
+                <button class="btn btn-default submit" type="submit">Entrar</button>
+                <!-- <a class="btn btn-default submit" onclick="document.login.submit()">Entrar</a> -->
                 <!--<a class="reset_pass" href="#">Esqueceu a senha?</a>-->
               </div>
 

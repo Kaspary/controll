@@ -23,8 +23,8 @@ def get_finances(request):
 
             d = json.loads(request.POST.get('date', None))
 
-            earnings = list(SystemUser.objects.get(user=request.user).earnings.filter(date__year=d['year'], date__month=d['month']).values('id', 'title', 'value', 'fixed'))
-            expense = list(SystemUser.objects.get(user=request.user).expense.filter(date__year=d['year'], date__month=d['month']).values('id', 'title', 'value', 'category', 'fixed'))
+            earnings = list(SystemUser.objects.get(user=request.user).earnings.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'fixed'))
+            expense = list(SystemUser.objects.get(user=request.user).expense.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'category', 'fixed'))
             category = list(SystemUser.objects.get(user=request.user).expense_category.all().values('id', 'title'))
 
             return JsonResponse({
@@ -43,6 +43,19 @@ def get_finances(request):
         except Exception as e:
             print('ERROR: ', str(e))
             return JsonResponse({'status': 'error', 'message_title': 'Erro ao iniciar finanças'})
+
+
+def get_expenses_category(request):
+    if request.method == 'POST' and request.is_ajax():
+        category = list(SystemUser.objects.get(user=request.user).expense_category.all().values('id', 'title'))
+
+        return JsonResponse({
+            'status': 'success',
+            'message_title': 'Categorias',
+            'category':category
+        })
+
+
 
 def save_earnings(request):
     if request.method == 'POST' and request.is_ajax():
@@ -161,13 +174,7 @@ def save_expense(request):
 
             SystemUser.objects.get(user=request.user).expense.add(expense)
 
-            category = SystemUser.objects.get(user=request.user).expense_category.all()
-            category_json=[]
-            for c in category:
-                category_json.append({
-                    'id': c.id,
-                    'title': c.title,
-                })
+            category = list(SystemUser.objects.get(user=request.user).expense_category.all().values('id', 'title'))
 
             return JsonResponse({
                 'status': 'success',
@@ -181,7 +188,7 @@ def save_expense(request):
                         'fixed': expense.fixed,
                         'date': expense.date
                     },
-                    'category': category_json,
+                    'category': category,
                     'total': _get_total_expense(d, request.user)
                 }
             })
@@ -259,6 +266,66 @@ def remove_expense(request):
         except Exception as e:
             print('ERROR: ',str(e))
             return JsonResponse({'status': 'error', 'message_title': 'Erro ao excluir'})
+
+
+def save_category_expense(request):
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            category=ExpensesCategory.objects.create(
+                title=request.POST['title'],
+            )
+
+            SystemUser.objects.get(user=request.user).expense_category.add(category)
+
+            return JsonResponse({
+                'status': 'success',
+                'message_title': 'Salvo com sucesso',
+                'category':{
+                    'id':category.id,
+                    'title':category.title,
+                }
+            })
+
+        except Exception as e:
+            print('ERROR: ',str(e))
+            return JsonResponse({'status': 'error', 'message_title': 'Erro ao salvar'})
+
+def edit_category_expense(request):
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            ExpensesCategory.objects.filter(id=request.POST['id']).update(
+                title=request.POST['title']
+            )
+
+            return JsonResponse({
+                'status': 'success',
+                'message_title': 'Editado com sucesso',
+                'category': {
+                    'id': request.POST['id'],
+                    'title': request.POST['title'],
+                }
+            })
+        except Exception as e:
+            print('ERROR: ',str(e))
+            return JsonResponse({'status': 'error', 'message_title': 'Erro ao editar'})
+
+def remove_category_expense(request):
+    if request.method == 'POST' and request.is_ajax():
+        try:
+            ExpensesCategory.objects.get(id=request.POST['id']).delete()
+            return JsonResponse({
+                'status': 'success',
+                'message_title': 'Excluido com sucesso',
+                'category': {
+                    'id': request.POST['id'],
+                }
+            })
+        except models.ProtectedError as e:
+            print('ERROR: ',str(e))
+            return JsonResponse({'status': 'error', 'message_title': 'Erro ao excluir', 'message_text': 'Esta categoria esta sendo utilizada, exclua o gasto primeiro.'})
+
+        return JsonResponse({'status': 'error', 'message_title': 'Erro ao excluir'})
+
 
 
 def _get_total_earnings(date, user):

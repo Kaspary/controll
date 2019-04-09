@@ -25,4 +25,10 @@ class SystemUser(models.Model):
 @receiver(post_save, sender=User)
 def create_user_operator(sender, instance, created, **kwargs):
     if created:
-        SystemUser.objects.create(user=instance)
+        systemUser = SystemUser.objects.create(user=instance)
+        systemUser.expense_category.add(
+            ExpensesCategory.objects.create(title='Outros'),
+            ExpensesCategory.objects.create(title='Alimentação'),
+            ExpensesCategory.objects.create(title='Saúde'),
+            ExpensesCategory.objects.create(title='Transporte'),
+        )
