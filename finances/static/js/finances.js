@@ -702,6 +702,7 @@ function ajax_get_finances() {
                 set_total_expanse(data.expense.total)
                 mount_table(data.earnings, data.expense);
             } else if (data.status == 'error') {
+                console.error(data.status)
             }
         },
         error: function (e) {

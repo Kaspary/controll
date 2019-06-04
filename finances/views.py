@@ -1,5 +1,5 @@
 import json
-from datetime import date
+from datetime import date, datetime
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -20,8 +20,10 @@ def get_finances(request):
 
     if request.method == 'POST' and request.is_ajax():
         try:
-
             d = json.loads(request.POST.get('date', None))
+
+            _set_fixed_earnings(d, request.user)
+            _set_fixed_expense(d, request.user)
 
             earnings = list(SystemUser.objects.get(user=request.user).earnings.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'fixed'))
             expense = list(SystemUser.objects.get(user=request.user).expense.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'category', 'fixed'))
@@ -344,3 +346,58 @@ def _get_total_expense(date, user):
     except Exception as e:
         print('ERROR: ', str(e))
         return 0.0
+
+
+def _set_fixed_earnings(date, user):
+    pass
+    # try:
+    #     month = date['month'] - 1
+    #     year = date['year']
+    #     if month == 0:
+    #         month = 12
+    #         year = date['year'] + 1
+    #
+    #     if SystemUser.objects.get(user=user).earnings.filter(date__year=year, date__month=month, fixed=True).exists():
+    #
+    #         earnings_fixed = SystemUser.objects.get(user=user).earnings.filter(date__year=year, date__month=month, fixed=True)
+    #
+    #         for e in earnings_fixed:
+    #             earning = Earnings.objects.create(
+    #                 title=e.title,
+    #                 value=e.value,
+    #                 fixed=e.fixed,
+    #                 description=e.description,
+    #                 date=datetime.now()
+    #             )
+    #             SystemUser.objects.get(user=user).earnings.add(earning)
+    #     return
+    #
+    # except Exception as e
+    #     month = date['month'] - 1
+    #     year = date['year']
+    #     if month == 0:
+    #         month = 12
+    #         year = date['year'] + 1
+    #
+    #     if SystemUser.objects.get(user=user).earnings.filter(date__year=year, date__month=month, fixed=True).exists():
+    #
+    #         earnings_fixed = SystemUser.objects.get(user=user).earnings.filter(date__year=year, date__month=month, fixed=True)
+    #
+    #         for e in earnings_fixed:
+    #             earning = Earnings.objects.create(
+    #                 title=e.title,
+    #                 value=e.value,
+    #                 fixed=e.fixed,
+    #                 description=e.description,
+    #                 date=datetime.now()
+    #             )
+    #             S:
+    #     print('ERROR: ', str(e))
+    #     return
+
+
+def _set_fixed_expense(date, user):
+    try:
+        pass
+    except Exception as e:
+        print('ERROR: ', str(e))
