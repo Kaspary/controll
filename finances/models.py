@@ -5,7 +5,6 @@ this command reset all migrations (to the zeroth state)
 python manage.py migrate --fake myappname zero
 """
 
-
 class ExpensesCategory(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=300)
