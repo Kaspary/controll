@@ -37,9 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
-    'finances',
-    'login',
+    'controll.core',
+    'controll.finances',
+    'controll.login',
 ]
 
 MIDDLEWARE = [
@@ -78,14 +78,22 @@ WSGI_APPLICATION = 'controll.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DB_NAME', 'controll_db'),
-        'USER': os.environ.get('DB_USER', 'kaspary'),
-        'PASSWORD': os.environ.get('DB_PASS', 'kaspary'),
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    },
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.environ.get('DB_NAME', 'controll_db'),
+#         'USER': os.environ.get('DB_USER', 'kaspary'),
+#         'PASSWORD': os.environ.get('DB_PASS', 'kaspary'),
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 
 # Password validation
