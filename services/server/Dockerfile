@@ -9,6 +9,7 @@ COPY ./requirements.txt /usr/src/app/requirements.txt
 # install dependencies
 RUN apt-get update -y && \
     apt-get install  gcc g++ musl-dev libpq-dev -y && \
+    pip3 install -r requirements.txt --no-cache-dir \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install -r requirements.txt --no-cache-dir
 
