@@ -4,8 +4,7 @@ FROM python:3.7.5-slim
 WORKDIR /usr/src/app
 
 RUN apt update -y 
-RUN apt install apt-utils -y
-RUN apt upgrade python-pip -y
+RUN python3 -m pip install --user --upgrade pip
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
