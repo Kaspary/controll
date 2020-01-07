@@ -27,7 +27,7 @@ services:
       context: ./services/server
       dockerfile: Dockerfile
     restart: on-failure
-    command: gunicorn --bind 0.0.0.0:8000 --timeout 120 --workers 2 server.wsgi
+    command: gunicorn --bind 0.0.0.0:8000 --timeout 120 --workers 2 controll.wsgi
     volumes:
       - './services/server:/usr/src/app'
     ports:
