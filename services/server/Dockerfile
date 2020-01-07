@@ -3,7 +3,9 @@ FROM python:3.7.5-slim
 # set working directory
 WORKDIR /usr/src/app
 
-RUN apt-get update -y && apt-get upgrade python-pip -y
+RUN apt update -y 
+RUN apt install apt-utils -y
+RUN apt upgrade python-pip -y
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
