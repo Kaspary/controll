@@ -3,16 +3,20 @@ FROM python:3.7.5-slim
 # set working directory
 WORKDIR /usr/src/app
 
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+
 #add and install requirements
-COPY ./requirements.txt /usr/src/app/requirements.txt
+#COPY ./requirements.txt /usr/src/app/requirements.txt
 
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        postgresql-client \
-    && rm -rf /var/lib/apt/lists/*
+#RUN apt-get update \
+#    && apt-get install -y --no-install-recommends \
+#        postgresql-client \
+#    && rm -rf /var/lib/apt/lists/*
 
-RUN pip install -r requirements.txt
+#RUN pip install -r requirements.txt
 
 # install dependencies
 #RUN apt-get update -y && \
