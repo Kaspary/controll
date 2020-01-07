@@ -10,7 +10,7 @@ services:
     volumes:
       # - "./data/certbot/conf:/etc/letsencrypt"
       # - "./data/certbot/www:/var/www/certbot"
-       - "./services/eliza/static:/static"
+       - "./services/server/static:/static"
       # - "./services/eliza/media:/media"
       # - "./services/eliza/eliza/chat/static/uploads:/uploads"
       # - "./services/eliza/eliza/voice_recorder/static/audios:/audios"
