@@ -37,8 +37,8 @@ RUN pip install gunicorn
 COPY . /usr/src/app
 
 # migrate database
-RUN python3 manage.py makemigrations && \
-   python3 manage.py migrate
+#RUN python3 manage.py makemigrations && \
+#   python3 manage.py migrate
 
 # run server
 # CMD

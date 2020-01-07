@@ -83,6 +83,9 @@ DATABASES = {
     },
 }
 
+DATABASES = {
+    'default': "postgres://admin:S3nh4f0rt3p0stgr35@databases:5432/controll"
+}
 
 # DATABASES = {
 #     'default': {
