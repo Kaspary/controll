@@ -1,0 +1,23 @@
+https://medium.com/@aditya_misra5/move-your-local-postgres-db-container-to-rds-in-12-simple-steps-84f9fd450c9e
+https://www.dbrnd.com/2018/04/postgresql-how-to-drop-all-tables/
+
+# access psql
+psql -h localhost -U admin eliza_db
+
+# Drop all tables
+DROP SCHEMA public CASCADE;
+
+# Exit psql
+# ctrl + d
+
+# dump files of postgres in server
+pg_dump -Fc -v -h localhost -U admin -d eliza_db -p 5432 > dump_file.dump
+
+# copy backup do host
+docker cp elizadocker_client-db_1:dump_file.dump ~/eliza-docker/services/client-db/backup/
+
+
+# restore dump to postgres of container
+pg_restore -c -h localhost -U admin -d eliza_db -v dump_file.dump
+
+
