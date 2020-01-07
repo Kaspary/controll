@@ -13,7 +13,7 @@ COPY ./requirements.txt /usr/src/app/requirements.txt
 #    python3 -m pip install -r requirements.txt --no-cache-dir
 
 RUN apt update -y && \
-	apt install python3-pip -y \
+	apt install python3-pip -y && \
 	pip3 install -r requirements.txt --no-cache-dir
 
 
