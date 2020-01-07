@@ -1,0 +1,50 @@
+version: '3.7'
+
+services:
+
+  nginx:
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      # - "./data/certbot/conf:/etc/letsencrypt"
+      # - "./data/certbot/www:/var/www/certbot"
+       - "./services/eliza/static:/static"
+      # - "./services/eliza/media:/media"
+      # - "./services/eliza/eliza/chat/static/uploads:/uploads"
+      # - "./services/eliza/eliza/voice_recorder/static/audios:/audios"
+    ports:
+      - 80:80
+      - 443:443
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - server
+      
+
+  server:
+    build:
+      context: ./services/eliza
+      dockerfile: Dockerfile-dev
+    restart: on-failure
+    command: gunicorn --bind 0.0.0.0:8000 --timeout 120 --workers 2 server.wsgi
+    volumes:
+      - './services/server:/usr/src/app'
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=0
+    depends_on:
+      - database
+      
+  
+  database:
+    build:
+      context: ./services/database
+      dockerfile: Dockerfile
+    ports:
+      - "5435:5432"
+    environment:
+     - POSTGRES_DB=controll
+     - POSTGRES_USER=admin
+     - POSTGRES_PASSWORD=S3nh4f0rt3p0stgr35
