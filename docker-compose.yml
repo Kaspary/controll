@@ -43,7 +43,7 @@ services:
       context: ./services/database
       dockerfile: Dockerfile
     ports:
-      - "5435:5432"
+      - "5432:5432"
     environment:
      - POSTGRES_DB=controll
      - POSTGRES_USER=admin
