@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -48,8 +48,8 @@
 <span id="file-qr-result">None</span>
 
 <script type="module">
-    import QrScanner from "https://nimiq.github.io/qr-scanner/qr-scanner.min.js";
-    QrScanner.WORKER_PATH = '../qr-scanner-worker.min.js';
+    import QrScanner from {% static 'qr-scanner/qr-scanner.min.js' %};
+    QrScanner.WORKER_PATH = {% static 'qr-scanner-worker.min.js' %};
 
     const video = document.getElementById('qr-video');
     const camHasCamera = document.getElementById('cam-has-camera');
