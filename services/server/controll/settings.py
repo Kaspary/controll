@@ -87,6 +87,8 @@ WSGI_APPLICATION = 'controll.wsgi.application'
 #     'default': "postgres://admin:S3nh4f0rt3p0stgr35@database:5432/controll"
 # }
 
+
+# Prod database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -97,6 +99,7 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
 
 # DATABASES = {
 #     'default': {
