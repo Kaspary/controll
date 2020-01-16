@@ -4,6 +4,7 @@ app_name='finances'
 
 urlpatterns = [
     url(r'^finances_management$', finances_management, name='finances_management'),
+    url(r'^qr_scanner$', qr_scanner, name='qr_scanner'),
 
     #AJAX METHODS
     url(r'^get_finances', get_finances, name='get_finances'),

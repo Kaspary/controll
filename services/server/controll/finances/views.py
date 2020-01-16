@@ -16,6 +16,15 @@ def finances_management(request):
 
     return render(request, 'finances_management.html', context)
 
+@login_required(login_url='login:login')
+def qr_scanner(request):
+    context = {
+        'system_user': SystemUser.objects.get(user=request.user)
+    }
+
+    return render(request, 'qr_scanner.html', context)
+
+
 def get_finances(request):
 
     if request.method == 'POST' and request.is_ajax():
@@ -327,6 +336,8 @@ def remove_category_expense(request):
             return JsonResponse({'status': 'error', 'message_title': 'Erro ao excluir', 'message_text': 'Esta categoria esta sendo utilizada, exclua o gasto primeiro.'})
 
         return JsonResponse({'status': 'error', 'message_title': 'Erro ao excluir'})
+
+
 
 
 

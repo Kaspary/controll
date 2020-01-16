@@ -1,0 +1,3 @@
+services/server/controll/core/migrations/* 
+services/server/controll/finances/migrations/*
+services/server/controll/login/migrations/*
