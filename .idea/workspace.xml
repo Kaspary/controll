@@ -2,21 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="45f0207a-b417-433d-87b5-2a907701574c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/database/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/database/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/controll/core/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/controll/core/migrations/0002_auto_20190327_1813.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/controll/core/migrations/0003_systemuser_expense_category.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/controll/core/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/services/server/controll/core/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/controll/finances/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/controll/finances/migrations/0002_auto_20190327_1911.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/controll/finances/migrations/0003_auto_20190512_2254.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/controll/finances/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/server/controll/finances/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/controll/finances/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/server/controll/finances/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/server/controll/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/server/controll/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/services/server/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/server/old-requirements.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
