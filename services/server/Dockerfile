@@ -6,6 +6,9 @@ WORKDIR /usr/src/app
 RUN apt update -y 
 RUN python3 -m pip install --user --upgrade pip
 
+RUN rm /etc/ssl/openssl.cnf
+COPY openssl.cnf /etc/ssl
+
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install gunicorn
