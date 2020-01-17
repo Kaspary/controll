@@ -70,13 +70,14 @@ class Nfce:
     def __str__(self):
         return '{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(self.company, self.number_nfc_e, self.emission_date, self.access_key, self.products, self.total_value, self.discount_value, self.payment_method, self.value_paid)
 
-
 def save_expanse_by_sefaz(url):
 
-	response = requests.get(url)
+	headers = {"Accept": "application/json"}
+
+	response = requests.get(url, headers=headers)
 	soup = BeautifulSoup(response.content, 'html.parser')
 	url = soup.find_all(id='iframeConteudo')[0]['src']
-	response = requests.get(url)
+	response = requests.get(url, headers=headers)
 	soup = BeautifulSoup(response.content, 'html.parser')
 	tables_list = soup.find(id='respostaWS').find('table').find('table').find('table').find_all('table')
 
