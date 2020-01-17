@@ -61,7 +61,7 @@ def save_expense_of_qr_code(request):
 
         except Exception as e:
             print('ERROR: ',str(e))
-            return JsonResponse({'status': 'error', 'message_title': 'Erro ao salvar'})
+            return JsonResponse({'status': 'error', 'message_title': 'Erro ao salvar', 'error': str(e)})
 
 
 

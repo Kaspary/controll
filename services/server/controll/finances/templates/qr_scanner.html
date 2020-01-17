@@ -165,6 +165,7 @@
                 'date': JSON.stringify(DATE),
             },
             success: function (data) {
+                console.log(data)
                 if (data.status == 'success') {
                     new PNotify({
                         title: data.message_title,
