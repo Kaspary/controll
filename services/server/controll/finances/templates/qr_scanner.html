@@ -1,94 +1,161 @@
-<!DOCTYPE html>{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>QR Scanner Demo</title>
-</head>
-<body>
-<style>
-    canvas {
-        display: none;
-    }
-    hr {
-        margin-top: 32px;
-    }
-    input[type="file"] {
-        display: block;
-        margin-bottom: 16px;
-    }
-    div {
-        margin-bottom: 16px;
-    }
-</style>
-<h1>Scan from WebCam:</h1>
-<div>
-    <b>Device has camera: </b>
-    <span id="cam-has-camera"></span>
-    <br>
-    <video muted playsinline id="qr-video"></video>
+{% extends "base.html" %} {% block content %} {% load static %}
+
+<input id="csrf_token_url" type="hidden" value="{{ csrf_token }}" />
+<input id="user_id" type="hidden" value="{{ user.pk }}" />
+
+<input id="get_finances_url" type="hidden" value="{% url 'finances:get_finances' %}" />
+
+<input id="save_earnings_url" type="hidden" value="{% url 'finances:save_earnings' %}" />
+<input id="edit_earnings_url" type="hidden" value="{% url 'finances:edit_earnings' %}" />
+<input id="fix_earnings_url" type="hidden" value="{% url 'finances:fix_earnings' %}" />
+<input id="remove_earnings_url" type="hidden" value="{% url 'finances:remove_earnings' %}" />
+
+<input id="save_expense_url" type="hidden" value="{% url 'finances:save_expense' %}" />
+<input id="edit_expense_url" type="hidden" value="{% url 'finances:edit_expense' %}" />
+<input id="fix_expense_url" type="hidden" value="{% url 'finances:fix_expense' %}" />
+<input id="remove_expense_url" type="hidden" value="{% url 'finances:remove_expense' %}" />
+
+<input id="get_expenses_category_url" type="hidden" value="{% url 'finances:get_expenses_category' %}" />
+<input id="save_category_expense_url" type="hidden" value="{% url 'finances:save_category_expense' %}" />
+<input id="edit_category_expense_url" type="hidden" value="{% url 'finances:edit_category_expense' %}" />
+<input id="remove_category_expense_url" type="hidden" value="{% url 'finances:remove_category_expense' %}" />
+
+{% block style %}
+
+<!-- Sweet Alert -->
+<link href="{% static 'vendors/SwetAlert/sweetalert2.min.css' %}" rel="stylesheet">
+
+{% endblock %}
+
+<!-- page content -->
+<div class="right_col" role="main">
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="header-date">
+                <div class="col-md-12">
+                    <h3>Gerenciamento de finanças</h3>
+                    <p> ----------------------------</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- card earnings -->
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>QR Code</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content" style="display: block;">
+<!--                    <style>-->
+<!--                        canvas {-->
+<!--                            display: none;-->
+<!--                        }-->
+
+<!--                        hr {-->
+<!--                            margin-top: 32px;-->
+<!--                        }-->
+
+<!--                        input[type="file"] {-->
+<!--                            display: block;-->
+<!--                            margin-bottom: 16px;-->
+<!--                        }-->
+
+<!--                        div {-->
+<!--                            margin-bottom: 16px;-->
+<!--                        }-->
+<!--                    </style>-->
+                    <h1>Scan from WebCam:</h1>
+                    <div>
+                        <b>Device has camera: </b>
+                        <span id="cam-has-camera"></span>
+                        <br>
+                        <video muted playsinline id="qr-video"></video>
+                    </div>
+                    <div>
+                        <select id="inversion-mode-select">
+                            <option value="original">Scan original (dark QR code on bright background)</option>
+                            <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
+                            <option value="both">Scan both</option>
+                        </select>
+                        <br>
+                    </div>
+                    <b>Detected QR code: </b>
+                    <span id="cam-qr-result">None</span>
+                    <br>
+                    <b>Last detected at: </b>
+                    <span id="cam-qr-result-timestamp"></span>
+                    <hr>
+
+                    <h1>Scan from File:</h1>
+                    <input type="file" id="file-selector">
+                    <b>Detected QR code: </b>
+                    <span id="file-qr-result">None</span>
+
+                    <script type="module">
+                        import QrScanner from "{% static 'qr_scanner/qr-scanner.min.js' %}";
+                        QrScanner.WORKER_PATH = "{% static 'qr_scanner/qr-scanner-worker.min.js' %}";
+
+                        const video = document.getElementById('qr-video');
+                        const camHasCamera = document.getElementById('cam-has-camera');
+                        const camQrResult = document.getElementById('cam-qr-result');
+                        const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
+                        const fileSelector = document.getElementById('file-selector');
+                        const fileQrResult = document.getElementById('file-qr-result');
+
+                        function setResult(label, result) {
+                            label.textContent = result;
+                            camQrResultTimestamp.textContent = new Date().toString();
+                            label.style.color = 'teal';
+                            clearTimeout(label.highlightTimeout);
+                            label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
+                        }
+
+                        // ####### Web Cam Scanning #######
+
+                        QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
+
+                        const scanner = new QrScanner(video, result => setResult(camQrResult, result));
+                        scanner.start();
+
+                        document.getElementById('inversion-mode-select').addEventListener('change', event => {
+                            scanner.setInversionMode(event.target.value);
+                        });
+
+                        // ####### File Scanning #######
+
+                        fileSelector.addEventListener('change', event => {
+                            const file = fileSelector.files[0];
+                            if (!file) {
+                                return;
+                            }
+                            QrScanner.scanImage(file)
+                                .then(result => setResult(fileQrResult, result))
+                                .catch(e => setResult(fileQrResult, e || 'No QR code found.'));
+                        });
+
+                    </script>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /card earnings -->
 </div>
-<div>
-    <select id="inversion-mode-select">
-        <option value="original">Scan original (dark QR code on bright background)</option>
-        <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
-        <option value="both">Scan both</option>
-    </select>
-    <br>
-</div>
-<b>Detected QR code: </b>
-<span id="cam-qr-result">None</span>
-<br>
-<b>Last detected at: </b>
-<span id="cam-qr-result-timestamp"></span>
-<hr>
+<!-- /page content -->
 
-<h1>Scan from File:</h1>
-<input type="file" id="file-selector">
-<b>Detected QR code: </b>
-<span id="file-qr-result">None</span>
 
-<script type="module">
-    import QrScanner from "{% static 'qr_scanner/qr-scanner.min.js' %}";
-    QrScanner.WORKER_PATH = "{% static 'qr_scanner/qr-scanner-worker.min.js' %}";
+{% endblock %}
 
-    const video = document.getElementById('qr-video');
-    const camHasCamera = document.getElementById('cam-has-camera');
-    const camQrResult = document.getElementById('cam-qr-result');
-    const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
-    const fileSelector = document.getElementById('file-selector');
-    const fileQrResult = document.getElementById('file-qr-result');
+{% block scripts %}
 
-    function setResult(label, result) {
-        label.textContent = result;
-        camQrResultTimestamp.textContent = new Date().toString();
-        label.style.color = 'teal';
-        clearTimeout(label.highlightTimeout);
-        label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
-    }
-
-    // ####### Web Cam Scanning #######
-
-    QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
-
-    const scanner = new QrScanner(video, result => setResult(camQrResult, result));
-    scanner.start();
-
-    document.getElementById('inversion-mode-select').addEventListener('change', event => {
-        scanner.setInversionMode(event.target.value);
-    });
-
-    // ####### File Scanning #######
-
-    fileSelector.addEventListener('change', event => {
-        const file = fileSelector.files[0];
-        if (!file) {
-            return;
-        }
-        QrScanner.scanImage(file)
-            .then(result => setResult(fileQrResult, result))
-            .catch(e => setResult(fileQrResult, e || 'No QR code found.'));
-    });
-
-</script>
-</body>
-</html>
+{% endblock %}

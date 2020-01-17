@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="45f0207a-b417-433d-87b5-2a907701574c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/nginx/dev.conf" beforeDir="false" afterPath="$PROJECT_DIR$/services/nginx/dev.conf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/server/controll/finances/templates/qr_scanner.html" beforeDir="false" afterPath="$PROJECT_DIR$/services/server/controll/finances/templates/qr_scanner.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/server/controll/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/server/controll/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,10 +43,10 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/services/server/controll/finances/static/qr_scanner" />
       <recent name="$PROJECT_DIR$/controll" />
       <recent name="$PROJECT_DIR$/core/static/css" />
-      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/core" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
