@@ -76,37 +76,25 @@ WSGI_APPLICATION = 'controll.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    },
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     },
+# }
 
 
 # Prod database
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'controll',
-#         'USER': 'admin',
-#         'PASSWORD': 'S3nh4f0rt3p0stgr35',
-#         'HOST': 'database',
-#         'PORT': '5432',
-#     }
-# }
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.environ.get('DB_NAME', 'controll_db'),
-#         'USER': os.environ.get('DB_USER', 'kaspary'),
-#         'PASSWORD': os.environ.get('DB_PASS', 'kaspary'),
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'controll',
+        'USER': 'admin',
+        'PASSWORD': 'S3nh4f0rt3p0stgr35',
+        'HOST': 'database',
+        'PORT': '5432',
+    }
+}
 
 
 # Password validation
