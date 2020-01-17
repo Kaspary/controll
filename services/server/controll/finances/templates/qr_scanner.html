@@ -56,95 +56,32 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="x_content" style="display: block;">
-<!--                    <style>-->
-<!--                        canvas {-->
-<!--                            display: none;-->
-<!--                        }-->
-
-<!--                        hr {-->
-<!--                            margin-top: 32px;-->
-<!--                        }-->
-
-<!--                        input[type="file"] {-->
-<!--                            display: block;-->
-<!--                            margin-bottom: 16px;-->
-<!--                        }-->
-
-<!--                        div {-->
-<!--                            margin-bottom: 16px;-->
-<!--                        }-->
-<!--                    </style>-->
-                    <h1>Scan from WebCam:</h1>
                     <div>
-                        <b>Device has camera: </b>
-                        <span id="cam-has-camera"></span>
-                        <br>
-                        <video muted playsinline id="qr-video"></video>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <video muted playsinline id="qr-video" style="width: 100%;"></video>
+                            </div>
+                        </div>
                     </div>
-                    <div>
+                    <!-- <div>
                         <select id="inversion-mode-select">
                             <option value="original">Scan original (dark QR code on bright background)</option>
                             <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
                             <option value="both">Scan both</option>
                         </select>
                         <br>
-                    </div>
-                    <b>Detected QR code: </b>
-                    <span id="cam-qr-result">None</span>
+                    </div> -->
+                    <b>Link detectado: </b>
+                    <a id="cam-qr-result" href="#" target=”_blank”>#</a>
                     <br>
-                    <b>Last detected at: </b>
-                    <span id="cam-qr-result-timestamp"></span>
-                    <hr>
+                    <!-- <b>Last detected at: </b> -->
+                    <!-- <span id="cam-qr-result-timestamp"></span> -->
+                    <!-- <hr> -->
 
-                    <h1>Scan from File:</h1>
+                    <!-- <h1>Scan from File:</h1>
                     <input type="file" id="file-selector">
                     <b>Detected QR code: </b>
-                    <span id="file-qr-result">None</span>
-
-                    <script type="module">
-                        import QrScanner from "{% static 'qr_scanner/qr-scanner.min.js' %}";
-                        QrScanner.WORKER_PATH = "{% static 'qr_scanner/qr-scanner-worker.min.js' %}";
-
-                        const video = document.getElementById('qr-video');
-                        const camHasCamera = document.getElementById('cam-has-camera');
-                        const camQrResult = document.getElementById('cam-qr-result');
-                        const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
-                        const fileSelector = document.getElementById('file-selector');
-                        const fileQrResult = document.getElementById('file-qr-result');
-
-                        function setResult(label, result) {
-                            label.textContent = result;
-                            camQrResultTimestamp.textContent = new Date().toString();
-                            label.style.color = 'teal';
-                            clearTimeout(label.highlightTimeout);
-                            label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
-                        }
-
-                        // ####### Web Cam Scanning #######
-
-                        QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
-
-                        const scanner = new QrScanner(video, result => setResult(camQrResult, result));
-                        scanner.start();
-
-                        document.getElementById('inversion-mode-select').addEventListener('change', event => {
-                            scanner.setInversionMode(event.target.value);
-                        });
-
-                        // ####### File Scanning #######
-
-                        fileSelector.addEventListener('change', event => {
-                            const file = fileSelector.files[0];
-                            if (!file) {
-                                return;
-                            }
-                            QrScanner.scanImage(file)
-                                .then(result => setResult(fileQrResult, result))
-                                .catch(e => setResult(fileQrResult, e || 'No QR code found.'));
-                        });
-
-                    </script>
-
+                    <span id="file-qr-result">None</span> -->
                 </div>
             </div>
         </div>
@@ -157,5 +94,108 @@
 {% endblock %}
 
 {% block scripts %}
+<script type="module">
+    import QrScanner from "{% static 'js/qr_scanner/qr-scanner.min.js' %}";
+    QrScanner.WORKER_PATH = "{% static 'js/qr_scanner/qr-scanner-worker.min.js' %}";
 
+    const video = document.getElementById('qr-video');
+    // const camHasCamera = document.getElementById('cam-has-camera');
+    const camQrResult = document.getElementById('cam-qr-result');
+    // const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
+    // const fileSelector = document.getElementById('file-selector');
+    // const fileQrResult = document.getElementById('file-qr-result');
+
+    const DATE = {
+        'year': '',
+        'month': '',
+        'day': ''
+    }
+
+    let date = new Date();
+    DATE.month = date.getMonth() + 1;
+    DATE.year = date.getFullYear();
+    DATE.day = date.getDate();
+
+    function setResult(label, result) {
+        label.textContent = result;
+        label.href = result;
+        // camQrResultTimestamp.textContent = new Date().toString();
+        label.style.color = 'teal';
+        clearTimeout(label.highlightTimeout);
+        label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
+        save_expense(result);
+        scanner.stop();
+    }
+
+    // ####### Web Cam Scanning #######
+
+    // QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
+
+    var scanner = new QrScanner(video, result => setResult(camQrResult, result));
+    scanner.start();
+
+
+    // document.getElementById('inversion-mode-select').addEventListener('change', event => {
+    //     scanner.setInversionMode(event.target.value);
+    // });
+
+    // ####### File Scanning #######
+
+    // fileSelector.addEventListener('change', event => {
+    //     const file = fileSelector.files[0];
+    //     if (!file) {
+    //         return;
+    //     }
+    //     QrScanner.scanImage(file)
+    //     .then(result => setResult(fileQrResult, result))
+    //     .catch(e => setResult(fileQrResult, e || 'No QR code found.'));
+    // });
+
+
+    function save_expense(url){
+
+        $.ajax({
+            url: "{% url 'finances:save_expense_of_qr_code' %}",
+            method: 'POST',
+            beforeSend: function (request) {
+                return request.setRequestHeader('X-CSRFToken', $('#csrf_token_url').val());
+            },
+            data: {
+                'url': url,
+                'date': JSON.stringify(DATE),
+            },
+            success: function (data) {
+                if (data.status == 'success') {
+                    new PNotify({
+                        title: data.message_title,
+                        text: '',
+                        delay: 1000,
+                        type: 'success',
+                        styling: 'bootstrap3'
+                    });
+
+                    // set_total_expanse(data.expense.total)
+
+                    // append_expanse(data.expense.expense, data.expense.category)
+
+                    // clear_form(form);
+
+                } else if (data.status == 'error') {
+                    new PNotify({
+                        title: data.message_title,
+                        text: '',
+                        delay: 1000,
+                        type: 'error',
+                        styling: 'bootstrap3'
+                    });
+                }
+            },
+            error: function (e) {
+                scanner.start();
+                console.error('ERROR AJAX:', e)
+            },
+        });
+    }
+
+</script>
 {% endblock %}

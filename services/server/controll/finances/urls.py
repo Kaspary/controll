@@ -7,6 +7,9 @@ urlpatterns = [
     url(r'^qr_scanner$', qr_scanner, name='qr_scanner'),
 
     #AJAX METHODS
+    url(r'^save_expense_of_qr_code', save_expense_of_qr_code, name='save_expense_of_qr_code'),
+
+    
     url(r'^get_finances', get_finances, name='get_finances'),
 
     url(r'^save_earnings', save_earnings, name='save_earnings'),
