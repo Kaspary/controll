@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="45f0207a-b417-433d-87b5-2a907701574c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/nginx/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/nginx/Dockerfile" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
