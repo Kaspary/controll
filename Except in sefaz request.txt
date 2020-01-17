@@ -1,0 +1,1 @@
+requests.exceptions.SSLError: HTTPSConnectionPool(host='www.sefaz.rs.gov.br', port=443): Max retries exceeded with url: /NFCE/NFCE-COM.aspx?p=43191201132478001452651080003755741311633253%7C2%7C1%7C2%7CEEB0A2387DA679C8693E64084986A6FA3071FC47 (Caused by SSLError(SSLError(1, '[SSL: UNSUPPORTED_PROTOCOL] unsupported protocol (_ssl.c:1076)')))

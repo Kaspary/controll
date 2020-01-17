@@ -72,12 +72,10 @@ class Nfce:
 
 def save_expanse_by_sefaz(url):
 
-	headers = {"Accept": "application/json"}
-
-	response = requests.get(url, headers=headers)
+	response = requests.get(url, verify=False)
 	soup = BeautifulSoup(response.content, 'html.parser')
 	url = soup.find_all(id='iframeConteudo')[0]['src']
-	response = requests.get(url, headers=headers)
+	response = requests.get(url, verify=False)
 	soup = BeautifulSoup(response.content, 'html.parser')
 	tables_list = soup.find(id='respostaWS').find('table').find('table').find('table').find_all('table')
 
