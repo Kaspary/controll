@@ -1,6 +1,11 @@
 from django.contrib import admin
-from .models import *
+from django.apps import apps
 
-admin.site.register(Expense)
-admin.site.register(Earnings)
-admin.site.register(ExpensesCategory)
+
+models = apps.get_app_config('finances').get_models()
+
+for model in models:
+    try:
+        admin.site.register(model)
+    except:
+        pass

@@ -28,36 +28,43 @@ def save_expense_of_qr_code(request):
     if request.method == 'POST' and request.is_ajax():
         try:
             d = json.loads(request.POST.get('date', None))
+            url = request.POST.get('url')
+            nfce = save_expanse_by_sefaz(url)
 
-            nfce = save_expanse_by_sefaz(request.POST.get('url'))
+            if nfce:
+                expense=Expense.objects.create(
+                    title=nfce.company.name,
+                    value=float(nfce.total_value.replace(',','.')),
+                    category=ExpensesCategory.objects.get(id='2'),
+                    date=date(d['year'], d['month'], d['day'])
+                )
 
-            expense=Expense.objects.create(
-                title=nfce.company.name,
-                value=float(nfce.total_value.replace(',','.')),
-                category=ExpensesCategory.objects.get(id='2'),
-                date=date(d['year'], d['month'], d['day'])
-            )
+                SystemUser.objects.get(user=request.user).expense.add(expense)
 
-            SystemUser.objects.get(user=request.user).expense.add(expense)
+                category = list(SystemUser.objects.get(user=request.user).expense_category.all().values('id', 'title'))
 
-            category = list(SystemUser.objects.get(user=request.user).expense_category.all().values('id', 'title'))
-
-            return JsonResponse({
-                'status': 'success',
-                'message_title': 'Salvo com sucesso',
-                'expense':{
+                return JsonResponse({
+                    'status': 'success',
+                    'message_title': 'Salvo com sucesso',
                     'expense':{
-                        'id': expense.pk,
-                        'title': expense.title,
-                        'value': float(expense.value),
-                        'category': expense.category.pk,
-                        'fixed': expense.fixed,
-                        'date': expense.date
-                    },
-                    'category': category,
-                    'total': _get_total_expense(d, request.user)
-                }
-            })
+                        'expense':{
+                            'id': expense.pk,
+                            'title': expense.title,
+                            'value': float(expense.value),
+                            'category': expense.category.pk,
+                            'fixed': expense.fixed,
+                            'date': expense.date
+                        },
+                        'category': category,
+                        'total': _get_total_expense(d, request.user)
+                    }
+                })
+
+            else:
+                ErrorOnSaveSefaz.objects.create(
+                    url = url,
+                    view = save_expense_of_qr_code)
+                return JsonResponse({'status': 'error', 'message_title': 'Erro ao salvar', 'error': str(e)})    
 
         except Exception as e:
             print('ERROR: ',str(e))
