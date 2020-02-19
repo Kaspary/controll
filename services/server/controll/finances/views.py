@@ -34,8 +34,8 @@ def save_expense_of_qr_code(request):
             if nfce:
                 expense=Expense.objects.create(
                     title=nfce.company.name,
-                    value=float(nfce.total_value.replace(',','.')),
-                    category=ExpensesCategory.objects.get(id='2'),
+                    value=nfce.total_value,
+                    category=ExpensesCategory.objects.get(id='1'),
                     date=date(d['year'], d['month'], d['day'])
                 )
 
@@ -64,7 +64,7 @@ def save_expense_of_qr_code(request):
                 ErrorOnSaveSefaz.objects.create(
                     url = url,
                     view = save_expense_of_qr_code)
-                return JsonResponse({'status': 'error', 'message_title': 'Erro ao salvar', 'error': str(e)})    
+                return JsonResponse({'status': 'error', 'message_title': 'Erro ao salvar', 'error': 'Nfce null'})    
 
         except Exception as e:
             print('ERROR: ',str(e))

@@ -1,5 +1,7 @@
 import re
 import requests
+import pytz
+from datetime import datetime
 from bs4 import BeautifulSoup
 from controll.finances.models import Company, Nfce, Product
 
@@ -71,12 +73,12 @@ def get_nfce(tables_list, company):
         nfce = Nfce.objects.create(
             company = company, 
             number_nfc_e = number_nfc_e, 
-            emission_date = emission_date, 
+            emission_date = datetime.strptime(emission_date, '%d/%m/%Y %H:%M:%S').replace(tzinfo=pytz.UTC),
             access_key = access_key, 
             total_value = float(total_value.replace(',','.')), 
             discount_value = float(discount_value.replace(',','.')), 
             payment_method = payment_method, 
-            value_paid = float(value_paid.replace(',','.')))
+            value_paid = float(value_paid.replace(',','.')) if value_paid!='NaN' else 0)
     except Exception as e:
         print(str(e))
         return None
@@ -93,7 +95,7 @@ def get_products(tables_list, nfce):
         amount = values[2].text
         unity = values[3].text
         value_per_unit = values[4].text
-        value_total = values[5].textnfce
+        value_total = values[5].text
         
         Product.objects.create(
             nfce = nfce,

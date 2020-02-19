@@ -69,7 +69,7 @@ class Nfce(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return '{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(self.company, self.number_nfc_e, self.emission_date,
+        return '{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(self.company, self.number_nfc_e, self.emission_date,
                                                            self.access_key, self.total_value,
                                                            self.discount_value, self.payment_method, self.value_paid)
 
