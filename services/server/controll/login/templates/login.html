@@ -55,9 +55,9 @@
               <div class="clearfix"></div>
 
               <div class="separator">
-                <!--<p class="change_link">Novo no site?-->
-                  <!--<a href="#signup" class="to_register"> Criar Conta </a>-->
-                <!--</p>-->
+                <p class="change_link">Novo no site?
+                  <a href="#signup" class="to_register"> Criar conta </a>
+                </p>
 
                 <div class="clearfix"></div>
                 <br />
@@ -71,42 +71,43 @@
           </section>
         </div>
 
-        <!--<div id="register" class="animate form registration_form">-->
-          <!--<section class="login_content">-->
-            <!--<form>-->
-              <!--<h1>Create Account</h1>-->
-              <!--<div>-->
-                <!--<input type="text" class="form-control" placeholder="Username" required="" />-->
-              <!--</div>-->
-              <!--<div>-->
-                <!--<input type="email" class="form-control" placeholder="Email" required="" />-->
-              <!--</div>-->
-              <!--<div>-->
-                <!--<input type="password" class="form-control" placeholder="Password" required="" />-->
-              <!--</div>-->
-              <!--<div>-->
-                <!--<a class="btn btn-default submit" href="index.html">Submit</a>-->
-              <!--</div>-->
-
-              <!--<div class="clearfix"></div>-->
-
-              <!--<div class="separator">-->
-                <!--<p class="change_link">Already a member ?-->
-                  <!--<a href="#signin" class="to_register"> Log in </a>-->
-                <!--</p>-->
-
-                <!--<div class="clearfix"></div>-->
-                <!--<br />-->
-
-                <!--<div>-->
-                  <!--<h1><i class="fa fa-check-square-o"></i> Gentelella Alela!</h1>-->
-                  <!--<p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and Terms</p>-->
-                <!--</div>-->
-              <!--</div>-->
-            <!--</form>-->
-          <!--</section>-->
-        <!--</div>-->
+        <div id="register" class="animate form registration_form">
+          <section class="login_content">
+            <form action="{% url 'core:register_user' %}" method="POST">
+              {% csrf_token %}
+              <h1>Criar conta</h1>
+              <div>
+                <input type="text" name="{{ form.username.name }}" class="form-control" placeholder="Usuário" required/>
+              </div>
+              <div>
+                <input type="email" name=" {{ form.email.name }}" class="form-control" placeholder="E-mail" required/>
+              </div>
+              <div>
+                <input type="password" name="{{ form.password1.name }}" class="form-control" placeholder="Senha" required/>
+              </div>
+              <div>
+                <button class="btn btn-default submit" type="submit">Criar</button>
+              </div>
+              <div class="clearfix"></div>
+              <div class="separator">
+                <p class="change_link">Já possui conta?
+                  <a href="#signin" class="to_register"> Fazer Login </a>
+                </p>
+                <div class="clearfix"></div>
+                <br />
+                <div>
+                  <h1><i class="fa fa-check-square-o"></i> Controle!</h1>
+                  <!-- <p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and Terms</p> -->
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
       </div>
     </div>
   </body>
 </html>
+
+
+
+

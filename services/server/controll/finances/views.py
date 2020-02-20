@@ -35,7 +35,7 @@ def save_expense_of_qr_code(request):
                 expense=Expense.objects.create(
                     title=nfce.company.name,
                     value=nfce.total_value,
-                    category=ExpensesCategory.objects.get(id='1'),
+                    category=SystemUser.objects.get(user=request.user).expense_category.first(),
                     date=date(d['year'], d['month'], d['day'])
                 )
 

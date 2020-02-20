@@ -4,4 +4,5 @@ app_name='core'
 
 urlpatterns = [
     url(r'^$', index, name='index'),
+    url(r'^register_user$', register_user, name='register_user'),
 ]

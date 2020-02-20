@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
-
+from controll.core.forms import UserForm
 
 def login_view(request):
     print('LOGIN')
@@ -12,7 +12,10 @@ def login_view(request):
         if request.method == 'POST':
             return _login_method(request)
         else:
-            return render(request, 'login.html')
+            context = {
+                'form': UserForm()
+            }
+            return render(request, 'login.html', context)
 
 
 def logout_view(request):
