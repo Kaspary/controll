@@ -13,13 +13,17 @@ class SystemUser(models.Model):
     earnings = models.ManyToManyField(Earnings)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    last_date_updated = models.DateField(auto_now=False, auto_now_add=False, null=True)
 
     def __str__(self):
         return str(self.pk)
 
     def full_name(self):
         return self.first_name +' '+ self.last_name
+
+
+class DateUpdated(models.Model): 
+    date = models.DateField(auto_now=False, auto_now_add=False, null=True)
+    system_user = models.ForeignKey(SystemUser, on_delete=models.CASCADE, related_name='date_updated')
 
 
 

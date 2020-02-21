@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils import timezone
 from .models import *
-from controll.core.models import SystemUser
+from controll.core.models import SystemUser, DateUpdated
 from .utils import save_expanse_by_sefaz, get_last_month
 
 @login_required(login_url='login:login')
@@ -408,12 +408,12 @@ def _get_total_expense(date, user):
 
 def _set_fixed_earnings_and_expense(date, user):
     try: 
-        if not SystemUser.objects.filter(user=user, last_date_updated__month=date['month'], last_date_updated__year=date['year']).exists():
+        if not SystemUser.objects.get(user=user).date_updated.filter(date__month=date['month'], date__year=date['year']).exists():
             
             system_user = SystemUser.objects.get(user=user)
-            system_user.last_date_updated = timezone.now()
-            system_user.save()
-
+            DateUpdated.objects.create(
+                system_user = system_user,
+                date = timezone.make_aware(date(date['year'],date['month'], 1)))
             month, year = get_last_month(date['month'], date['year'])    
             
             earnings_fixed = system_user.earnings.filter(date__year=year, date__month=month, fixed=True)
@@ -441,3 +441,40 @@ def _set_fixed_earnings_and_expense(date, user):
 
     except Exception as e:
         print('ERROR: ', str(e))
+
+
+
+    # try: 
+    #     if not SystemUser.objects.filter(user=user, last_date_updated__month=date['month'], last_date_updated__year=date['year']).exists():
+            
+    #         system_user = SystemUser.objects.get(user=user)
+    #         system_user.last_date_updated = timezone.now()
+    #         system_user.save()
+
+    #         month, year = get_last_month(date['month'], date['year'])    
+            
+    #         earnings_fixed = system_user.earnings.filter(date__year=year, date__month=month, fixed=True)
+    #         for earning in earnings_fixed:
+    #             earning = Earnings.objects.create(
+    #                 title=earning.title,
+    #                 value=earning.value,
+    #                 fixed=earning.fixed,
+    #                 description=earning.description,
+    #                 date=datetime.now()
+    #             )
+    #             system_user.earnings.add(earning)
+
+    #         expenses_fixed = system_user.expense.filter(date__year=year, date__month=month, fixed=True)
+    #         for expense in expenses_fixed:
+    #             expense = Expense.objects.create(
+    #                 title = expense.title,
+    #                 description = expense.description,
+    #                 value = expense.value,
+    #                 fixed = expense.fixed,
+    #                 category = expense.category,
+    #                 date = datetime.now()
+    #             )
+    #             system_user.expense.add(expense)
+
+    # except Exception as e:
+    #     print('ERROR: ', str(e))
