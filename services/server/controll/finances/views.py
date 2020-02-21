@@ -4,9 +4,10 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django.utils import timezone
 from .models import *
 from controll.core.models import SystemUser
-from .utils import save_expanse_by_sefaz
+from .utils import save_expanse_by_sefaz, get_last_month
 
 @login_required(login_url='login:login')
 def finances_management(request):
@@ -78,8 +79,7 @@ def get_finances(request):
         try:
             d = json.loads(request.POST.get('date', None))
 
-            _set_fixed_earnings(d, request.user)
-            _set_fixed_expense(d, request.user)
+            _set_fixed_earnings_and_expense(d, request.user)
 
             earnings = list(SystemUser.objects.get(user=request.user).earnings.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'fixed'))
             expense = list(SystemUser.objects.get(user=request.user).expense.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'category', 'fixed'))
@@ -406,56 +406,38 @@ def _get_total_expense(date, user):
         return 0.0
 
 
-def _set_fixed_earnings(date, user):
-    pass
-    # try:
-    #     month = date['month'] - 1
-    #     year = date['year']
-    #     if month == 0:
-    #         month = 12
-    #         year = date['year'] + 1
-    #
-    #     if SystemUser.objects.get(user=user).earnings.filter(date__year=year, date__month=month, fixed=True).exists():
-    #
-    #         earnings_fixed = SystemUser.objects.get(user=user).earnings.filter(date__year=year, date__month=month, fixed=True)
-    #
-    #         for e in earnings_fixed:
-    #             earning = Earnings.objects.create(
-    #                 title=e.title,
-    #                 value=e.value,
-    #                 fixed=e.fixed,
-    #                 description=e.description,
-    #                 date=datetime.now()
-    #             )
-    #             SystemUser.objects.get(user=user).earnings.add(earning)
-    #     return
-    #
-    # except Exception as e
-    #     month = date['month'] - 1
-    #     year = date['year']
-    #     if month == 0:
-    #         month = 12
-    #         year = date['year'] + 1
-    #
-    #     if SystemUser.objects.get(user=user).earnings.filter(date__year=year, date__month=month, fixed=True).exists():
-    #
-    #         earnings_fixed = SystemUser.objects.get(user=user).earnings.filter(date__year=year, date__month=month, fixed=True)
-    #
-    #         for e in earnings_fixed:
-    #             earning = Earnings.objects.create(
-    #                 title=e.title,
-    #                 value=e.value,
-    #                 fixed=e.fixed,
-    #                 description=e.description,
-    #                 date=datetime.now()
-    #             )
-    #             S:
-    #     print('ERROR: ', str(e))
-    #     return
+def _set_fixed_earnings_and_expense(date, user):
+    try: 
+        if not SystemUser.objects.filter(user=user, last_date_updated__month=date['month'], last_date_updated__year=date['year']).exists():
+            
+            system_user = SystemUser.objects.get(user=user)
+            system_user.last_date_updated = timezone.now()
+            system_user.save()
 
+            month, year = get_last_month(date['month'], date['year'])    
+            
+            earnings_fixed = system_user.earnings.filter(date__year=year, date__month=month, fixed=True)
+            for earning in earnings_fixed:
+                earning = Earnings.objects.create(
+                    title=earning.title,
+                    value=earning.value,
+                    fixed=earning.fixed,
+                    description=earning.description,
+                    date=datetime.now()
+                )
+                system_user.earnings.add(earning)
 
-def _set_fixed_expense(date, user):
-    try:
-        pass
+            expenses_fixed = system_user.expense.filter(date__year=year, date__month=month, fixed=True)
+            for expense in expenses_fixed:
+                expense = Expense.objects.create(
+                    title = expense.title,
+                    description = expense.description,
+                    value = expense.value,
+                    fixed = expense.fixed,
+                    category = expense.category,
+                    date = datetime.now()
+                )
+                system_user.expense.add(expense)
+
     except Exception as e:
         print('ERROR: ', str(e))

@@ -106,3 +106,11 @@ def get_products(tables_list, nfce):
             value_per_unit = float(value_per_unit.replace(',','.')), 
             value_total = float(value_total.replace(',','.')))
     return
+
+def get_last_month(month, year):
+    month-=1
+    if month == 0:
+        month = 12
+        year-=1
+
+    return month, year

@@ -13,6 +13,7 @@ class SystemUser(models.Model):
     earnings = models.ManyToManyField(Earnings)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    last_date_updated = models.DateField(auto_now=False, auto_now_add=False, null=True)
 
     def __str__(self):
         return str(self.pk)
