@@ -1,5 +1,5 @@
 import json
-from datetime import date, datetime
+from datetime import datetime, date as datetime_date
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -409,11 +409,11 @@ def _get_total_expense(date, user):
 def _set_fixed_earnings_and_expense(date, user):
     try: 
         if not SystemUser.objects.get(user=user).date_updated.filter(date__month=date['month'], date__year=date['year']).exists():
-            
+            print("PASSOU AQUIIII")
             system_user = SystemUser.objects.get(user=user)
             DateUpdated.objects.create(
                 system_user = system_user,
-                date = timezone.make_aware(date(date['year'],date['month'], 1)))
+                date = timezone.make_aware(datetime(date['year'],date['month'], date['day'])))
             month, year = get_last_month(date['month'], date['year'])    
             
             earnings_fixed = system_user.earnings.filter(date__year=year, date__month=month, fixed=True)
@@ -423,7 +423,7 @@ def _set_fixed_earnings_and_expense(date, user):
                     value=earning.value,
                     fixed=earning.fixed,
                     description=earning.description,
-                    date=datetime.now()
+                    date=timezone.make_aware(datetime(date['year'],date['month'], date['day']))
                 )
                 system_user.earnings.add(earning)
 
@@ -435,7 +435,7 @@ def _set_fixed_earnings_and_expense(date, user):
                     value = expense.value,
                     fixed = expense.fixed,
                     category = expense.category,
-                    date = datetime.now()
+                    date = timezone.make_aware(datetime(date['year'],date['month'], date['day']))
                 )
                 system_user.expense.add(expense)
 
