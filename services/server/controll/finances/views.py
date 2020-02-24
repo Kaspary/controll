@@ -37,7 +37,7 @@ def save_expense_of_qr_code(request):
                     title=nfce.company.name,
                     value=nfce.total_value,
                     category=SystemUser.objects.get(user=request.user).expense_category.first(),
-                    date=date(d['year'], d['month'], d['day'])
+                    date=datetime_date(d['year'], d['month'], d['day'])
                 )
 
                 SystemUser.objects.get(user=request.user).expense.add(expense)
@@ -123,7 +123,7 @@ def save_earnings(request):
             earning=Earnings.objects.create(
                 title=request.POST['title'],
                 value=request.POST['value'],
-                date=date(d['year'], d['month'], d['day'])
+                date=datetime_date(d['year'], d['month'], d['day'])
             )
 
             SystemUser.objects.get(user=request.user).earnings.add(earning)
@@ -227,7 +227,7 @@ def save_expense(request):
                 title=request.POST['title'],
                 value=request.POST['value'],
                 category=ExpensesCategory.objects.get(id=request.POST['category']),
-                date=date(d['year'], d['month'], d['day'])
+                date=datetime_date(d['year'], d['month'], d['day'])
             )
 
             SystemUser.objects.get(user=request.user).expense.add(expense)
