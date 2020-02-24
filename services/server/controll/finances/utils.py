@@ -6,13 +6,18 @@ from bs4 import BeautifulSoup
 from controll.finances.models import Company, Nfce, Product
 
 
-def save_expanse_by_sefaz(url):
+def save_expanse_by_sefaz(url_root):
     """ get data from html sefaz """
-    response = requests.get(url)
+    response = requests.get(url_root)
     soup = BeautifulSoup(response.content, 'html.parser')
     url = soup.find_all(id='iframeConteudo')[0]['src']
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
+    
+    if 'emitida em contingência' in soup.find(id='respostaWS').text:
+        return Nfce.objects.create(
+            url = url_root,
+            in_contingency = True)
     try:
         tables_list = soup.find(id='respostaWS').find('table').find('table').find('table').find_all('table')
     except Exception as e:
@@ -20,10 +25,9 @@ def save_expanse_by_sefaz(url):
         return None
 
     nfce = None
-
     company = get_company(tables_list)
     if company:
-        nfce = get_nfce(tables_list, company)
+        nfce = get_nfce(tables_list, company, url_root)
         if nfce:
             get_products(tables_list, nfce)
 
@@ -53,7 +57,7 @@ def get_company(tables_list):
     return company
 
 
-def get_nfce(tables_list, company):
+def get_nfce(tables_list, company, url_root):
     """get nfc-e informations"""
     values = tables_list[3].find_all(class_='NFCCabecalho_SubTitulo')
     tmp = [' '.join(v.split()) for v in values[0].text.strip().split('\n')]
@@ -78,7 +82,8 @@ def get_nfce(tables_list, company):
             total_value = float(total_value.replace(',','.')), 
             discount_value = float(discount_value.replace(',','.')), 
             payment_method = payment_method, 
-            value_paid = float(value_paid.replace(',','.')) if value_paid!='NaN' else 0)
+            value_paid = float(value_paid.replace(',','.')) if value_paid!='NaN' else 0,
+            url = url_root)
     except Exception as e:
         print(str(e))
         return None

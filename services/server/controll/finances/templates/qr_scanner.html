@@ -189,6 +189,14 @@
                         type: 'error',
                         styling: 'bootstrap3'
                     });
+                }else if(data.status = 'warning'){
+                    new PNotify({
+                        title: data.message_title,
+                        text: data.message_text,
+                        delay: 10000,
+                        type: 'notice',
+                        styling: 'bootstrap3'
+                    });
                 }
             },
             error: function (e) {

@@ -33,6 +33,10 @@ def save_expense_of_qr_code(request):
             nfce = save_expanse_by_sefaz(url)
 
             if nfce:
+
+                if nfce.in_contingency:
+                    return JsonResponse({'status': 'warning', 'message_title': 'Nota físcal emitida em contingência', 'message_text': 'Assim que possível esta nota fiscal será salva'})
+
                 expense=Expense.objects.create(
                     title=nfce.company.name,
                     value=nfce.total_value,
@@ -65,7 +69,7 @@ def save_expense_of_qr_code(request):
                 ErrorOnSaveSefaz.objects.create(
                     url = url,
                     view = save_expense_of_qr_code)
-                return JsonResponse({'status': 'error', 'message_title': 'Erro ao salvar', 'error': 'Nfce null'})    
+                return JsonResponse({'status': 'error', 'message_title': 'Erro ao salvar', 'error': 'Nfce null'})
 
         except Exception as e:
             print('ERROR: ',str(e))
@@ -80,6 +84,7 @@ def get_finances(request):
             d = json.loads(request.POST.get('date', None))
 
             _set_fixed_earnings_and_expense(d, request.user)
+            _verify_nfce_in_contingency()
 
             earnings = list(SystemUser.objects.get(user=request.user).earnings.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'fixed'))
             expense = list(SystemUser.objects.get(user=request.user).expense.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'category', 'fixed'))
@@ -404,6 +409,13 @@ def _get_total_expense(date, user):
     except Exception as e:
         print('ERROR: ', str(e))
         return 0.0
+
+def _verify_nfce_in_contingency():
+    if Nfce.objects.filter(in_contingency=True).exists():
+        for nfce in Nfce.objects.filter(in_contingency=True):
+            new_nfce = save_expanse_by_sefaz(nfce.url)
+            if new_nfce:
+                nfce.delete()
 
 
 def _set_fixed_earnings_and_expense(date, user):

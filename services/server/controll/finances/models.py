@@ -56,17 +56,21 @@ class Company(BaseModel):
 
 class Nfce(BaseModel):
 
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True)
     #products = models.Ma
-    number_nfc_e = models.CharField(max_length=50)
-    emission_date = models.DateTimeField()
-    access_key = models.CharField(max_length=100)
-    total_value = models.FloatField()
-    discount_value = models.FloatField()
-    payment_method = models.CharField(max_length=50)
-    value_paid = models.FloatField()
+    number_nfc_e = models.CharField(max_length=50, null=True, blank=True)
+    emission_date = models.DateTimeField(null=True)
+    access_key = models.CharField(max_length=100, null=True, blank=True)
+    total_value = models.FloatField(null=True)
+    discount_value = models.FloatField(null=True)
+    payment_method = models.CharField(max_length=50, null=True, blank=True)
+    value_paid = models.FloatField(null=True)
+    url = models.CharField(max_length=500)
+    in_contingency = models.BooleanField(default=False)
 
     def __str__(self):
+        if self.in_contingency:
+            return 'Em contingência, id={}'.format(self.id)
         return '{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}'.format(self.company, self.number_nfc_e, self.emission_date,
                                                            self.access_key, self.total_value,
                                                            self.discount_value, self.payment_method, self.value_paid)
