@@ -41,8 +41,7 @@ def save_expense_of_qr_code(request):
                     title=nfce.company.name,
                     value=nfce.total_value,
                     category=SystemUser.objects.get(user=request.user).expense_category.first(),
-                    date=datetime_date(d['year'], d['month'], d['day'])
-                )
+                    date=nfce.emission_date)
                 SystemUser.objects.get(user=request.user).expense.add(expense)
 
                 category = list(SystemUser.objects.get(user=request.user).expense_category.all().values('id', 'title'))
@@ -83,14 +82,7 @@ def get_finances(request):
             d = json.loads(request.POST.get('date', None))
 
             _set_fixed_earnings_and_expense(d, request.user)
-            nfce = _verify_nfce_in_contingency()
-            if nfce:
-                expense=Expense.objects.create(
-                    title=new_nfce.company.name,
-                    value=new_nfce.total_value,
-                    category=SystemUser.objects.get(user=request.user).expense_category.first(),
-                    date=new_nfce.emission_date)
-                SystemUser.objects.get(user=request.user).expense.add(expense)
+            _verify_nfce_in_contingency(request.user)    
 
             earnings = list(SystemUser.objects.get(user=request.user).earnings.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'fixed'))
             expense = list(SystemUser.objects.get(user=request.user).expense.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'category', 'fixed'))
@@ -416,14 +408,18 @@ def _get_total_expense(date, user):
         print('ERROR: ', str(e))
         return 0.0
 
-def _verify_nfce_in_contingency():
+def _verify_nfce_in_contingency(user):
     if Nfce.objects.filter(in_contingency=True).exists():
         for nfce in Nfce.objects.filter(in_contingency=True):
             new_nfce = save_expanse_by_sefaz(nfce.url)
             if new_nfce:
                 nfce.delete()
-                return new_nfce
-    return None
+                expense=Expense.objects.create(
+                    title=new_nfce.company.name,
+                    value=new_nfce.total_value,
+                    category=SystemUser.objects.get(user=user).expense_category.first(),
+                    date=new_nfce.emission_date)
+                SystemUser.objects.get(user=user).expense.add(expense)
 
 
 def _set_fixed_earnings_and_expense(date, user):
