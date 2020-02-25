@@ -43,7 +43,6 @@ def save_expense_of_qr_code(request):
                     category=SystemUser.objects.get(user=request.user).expense_category.first(),
                     date=datetime_date(d['year'], d['month'], d['day'])
                 )
-
                 SystemUser.objects.get(user=request.user).expense.add(expense)
 
                 category = list(SystemUser.objects.get(user=request.user).expense_category.all().values('id', 'title'))
@@ -416,6 +415,14 @@ def _verify_nfce_in_contingency():
             new_nfce = save_expanse_by_sefaz(nfce.url)
             if new_nfce:
                 nfce.delete()
+                expense=Expense.objects.create(
+                    title=new_nfce.company.name,
+                    value=new_nfce.total_value,
+                    category=SystemUser.objects.get(user=request.user).expense_category.first(),
+                    date=datetime_date(d['year'], d['month'], d['day'])
+                )
+
+                SystemUser.objects.get(user=request.user).expense.add(expense)
 
 
 def _set_fixed_earnings_and_expense(date, user):
@@ -453,40 +460,3 @@ def _set_fixed_earnings_and_expense(date, user):
 
     except Exception as e:
         print('ERROR: ', str(e))
-
-
-
-    # try: 
-    #     if not SystemUser.objects.filter(user=user, last_date_updated__month=date['month'], last_date_updated__year=date['year']).exists():
-            
-    #         system_user = SystemUser.objects.get(user=user)
-    #         system_user.last_date_updated = timezone.now()
-    #         system_user.save()
-
-    #         month, year = get_last_month(date['month'], date['year'])    
-            
-    #         earnings_fixed = system_user.earnings.filter(date__year=year, date__month=month, fixed=True)
-    #         for earning in earnings_fixed:
-    #             earning = Earnings.objects.create(
-    #                 title=earning.title,
-    #                 value=earning.value,
-    #                 fixed=earning.fixed,
-    #                 description=earning.description,
-    #                 date=datetime.now()
-    #             )
-    #             system_user.earnings.add(earning)
-
-    #         expenses_fixed = system_user.expense.filter(date__year=year, date__month=month, fixed=True)
-    #         for expense in expenses_fixed:
-    #             expense = Expense.objects.create(
-    #                 title = expense.title,
-    #                 description = expense.description,
-    #                 value = expense.value,
-    #                 fixed = expense.fixed,
-    #                 category = expense.category,
-    #                 date = datetime.now()
-    #             )
-    #             system_user.expense.add(expense)
-
-    # except Exception as e:
-    #     print('ERROR: ', str(e))
