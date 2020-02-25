@@ -83,7 +83,14 @@ def get_finances(request):
             d = json.loads(request.POST.get('date', None))
 
             _set_fixed_earnings_and_expense(d, request.user)
-            _verify_nfce_in_contingency()
+            nfce = _verify_nfce_in_contingency()
+            if nfce:
+                expense=Expense.objects.create(
+                    title=new_nfce.company.name,
+                    value=new_nfce.total_value,
+                    category=SystemUser.objects.get(user=request.user).expense_category.first(),
+                    date=new_nfce.emission_date)
+                SystemUser.objects.get(user=request.user).expense.add(expense)
 
             earnings = list(SystemUser.objects.get(user=request.user).earnings.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'fixed'))
             expense = list(SystemUser.objects.get(user=request.user).expense.filter(date__year=d['year'], date__month=d['month']).order_by('created_at').values('id', 'title', 'value', 'category', 'fixed'))
@@ -415,14 +422,8 @@ def _verify_nfce_in_contingency():
             new_nfce = save_expanse_by_sefaz(nfce.url)
             if new_nfce:
                 nfce.delete()
-                expense=Expense.objects.create(
-                    title=new_nfce.company.name,
-                    value=new_nfce.total_value,
-                    category=SystemUser.objects.get(user=request.user).expense_category.first(),
-                    date=datetime_date(d['year'], d['month'], d['day'])
-                )
-
-                SystemUser.objects.get(user=request.user).expense.add(expense)
+                return new_nfce
+    return None
 
 
 def _set_fixed_earnings_and_expense(date, user):
