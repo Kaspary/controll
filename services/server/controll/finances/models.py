@@ -26,6 +26,8 @@ class Expense(BaseModel):
     date = models.DateTimeField()
     fixed = models.BooleanField(default=False)
     category = models.ForeignKey(ExpensesCategory, null=True, on_delete=models.PROTECT)
+    fixed_copied = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.title
@@ -36,6 +38,7 @@ class Earnings(BaseModel):
     value = models.FloatField(0)
     date = models.DateTimeField()
     fixed = models.BooleanField(default=False)
+    fixed_copied = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

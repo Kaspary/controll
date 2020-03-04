@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.utils import timezone
 from .models import *
-from controll.core.models import SystemUser, DateUpdated
+from controll.core.models import SystemUser
 from .utils import save_expanse_by_sefaz, get_last_month
 
 @login_required(login_url='login:login')
@@ -413,6 +413,7 @@ def _verify_nfce_in_contingency(user):
         for nfce in Nfce.objects.filter(in_contingency=True):
             new_nfce = save_expanse_by_sefaz(nfce.url)
             if new_nfce:
+                #TODO: Não salvar a nova nota fiscal, retornar a nfce sem salvar e fazer update da nfce antiga
                 nfce.delete()
                 expense=Expense.objects.create(
                     title=new_nfce.company.name,
@@ -424,15 +425,12 @@ def _verify_nfce_in_contingency(user):
 
 def _set_fixed_earnings_and_expense(date, user):
     try: 
-        if not SystemUser.objects.get(user=user).date_updated.filter(date__month=date['month'], date__year=date['year']).exists():
-            print("PASSOU AQUIIII")
-            system_user = SystemUser.objects.get(user=user)
-            DateUpdated.objects.create(
-                system_user = system_user,
-                date = timezone.make_aware(datetime(date['year'],date['month'], date['day'])))
-            month, year = get_last_month(date['month'], date['year'])    
-            
-            earnings_fixed = system_user.earnings.filter(date__year=year, date__month=month, fixed=True)
+
+        month, year = get_last_month(date['month'], date['year'])
+        system_user = SystemUser.objects.get(user=user)
+
+        if system_user.earnings.filter(date__month=month, date__year=year, fixed=True, fixed_copied=False).exists():
+            earnings_fixed = system_user.earnings.filter(date__year=year, date__month=month, fixed=True, fixed_copied=False)
             for earning in earnings_fixed:
                 earning = Earnings.objects.create(
                     title=earning.title,
@@ -442,8 +440,10 @@ def _set_fixed_earnings_and_expense(date, user):
                     date=timezone.make_aware(datetime(date['year'],date['month'], date['day']))
                 )
                 system_user.earnings.add(earning)
+                earnings_fixed.update(fixed_copied=True)
 
-            expenses_fixed = system_user.expense.filter(date__year=year, date__month=month, fixed=True)
+        if system_user.expense.filter(date__month=month, date__year=year, fixed=True, fixed_copied=False).exists():
+            expenses_fixed = system_user.expense.filter(date__year=year, date__month=month, fixed=True, fixed_copied=False)
             for expense in expenses_fixed:
                 expense = Expense.objects.create(
                     title = expense.title,
@@ -454,6 +454,7 @@ def _set_fixed_earnings_and_expense(date, user):
                     date = timezone.make_aware(datetime(date['year'],date['month'], date['day']))
                 )
                 system_user.expense.add(expense)
+                expenses_fixed.update(fixed_copied=True)
 
     except Exception as e:
         print('ERROR: ', str(e))
